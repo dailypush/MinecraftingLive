@@ -20,3 +20,9 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --permanent --zone=public --add-port=25565/tcp
 sudo firewall-cmd --permanent --zone=public --add-port=25565/udp
 sudo firewall-cmd --reload
+
+sudo touch /var/log/minecraft-cron.log
+sudo chown opc:opc /var/log/minecraft-cron.log
+sudo chmod 640  /var/log/minecraft-cron.log
+sudo crontab -l 2>/dev/null; echo "0 2 * * * cd ~/minecraft-docker && make generate-map > /var/log/minecraft-cron.log 2>&1") | crontab -
+sudo docker run -p 80:80 -p 443:443 -v ./overviewer-data:/usr/share/nginx/html:ro leaflet-app --name maps

@@ -16,7 +16,7 @@ COPY /overviewer-data /usr/share/nginx/html/
 RUN chown -R root:root /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html
 
 # Expose port 80 for the NGINX server
-EXPOSE 80
+EXPOSE 80 443
 
 # Start the NGINX server in the foreground
 CMD ["nginx", "-g", "daemon off;"]
