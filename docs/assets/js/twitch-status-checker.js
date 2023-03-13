@@ -1,6 +1,3 @@
-require("jquery");
-
-window.$ = window.jQuery;
 
 var users = ["waldo0240", "notch", "dream"]; // Replace this array with the Twitch usernames you want to retrieve data for
 var client_id = "q6750mt57tam2vu6s9gze2bm0jxlle";
