@@ -1,3 +1,4 @@
+$(document).ready(function() {
 var client_id = "q6750mt57tam2vu6s9gze2bm0jxlle";
 var channels = ["waldo0240", "notch", "dream", "minecraft"];
 var index = 0;
@@ -30,3 +31,4 @@ var checkChannel = function() {
 };
 
 checkChannel();
+});
