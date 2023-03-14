@@ -12,10 +12,10 @@ services:
       SERVER_NAME: "Our Minecraft Server"
       MOTD: "First Peaceful World"
 
-      DIFFICULTY: "peaceful"
+      DIFFICULTY: "normal"
 
       # https://github.com/itzg/docker-minecraft-server#memory-limit
-      MEMORY: 2G
+      MEMORY: 3G
 
       # uncomment this to import a saved game. (put your savegame directory in the saves-to-import directory)
       # WORLD: "/worlds/My-World"
@@ -23,3 +23,26 @@ services:
     volumes:
       - ./minecraft-data:/data
       - ./saves-to-import:/worlds:ro
+
+  backups:
+    image: itzg/mc-backup
+    environment:
+      BACKUP_INTERVAL: "2h"
+      # instead of network_mode below, could declare RCON_HOST
+      # RCON_HOST: mc
+    volumes:
+      # mount the same volume used by server, but read-only
+      - ./minecraft-data:/data:ro
+      # use a host attached directory so that it in turn can be backed up
+      # to external/cloud storage
+      - ./mc-backups:/backups:rw
+    # share network namespace with server to simplify rcon access
+    network_mode: "service:mc"
+
+  webpage:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./overviewer-data:/usr/share/nginx/html:ro
