@@ -61,8 +61,59 @@ function displayFeaturedStreamers(streamers) {
         followButton.className = "btn btn-primary mt-auto";
         followButton.textContent = "Follow on Twitch";
         cardBody.appendChild(followButton);
+
+        // const cardFooter = document.createElement("div");
+        // cardFooter.className = "card-footer text-center";
+        // cardFooter.textContent = `Followers: ${streamer.followers}`;
+        // card.appendChild(cardFooter);
     });
 }
+
+// function displayFeaturedStreamers(streamers) {
+//     const featuredStreamersContainer = document.getElementById("featured-streamers");
+
+//     streamers.forEach((streamer) => {
+//         const col = document.createElement("div");
+//         col.className = "col-md-4";
+//         featuredStreamersContainer.appendChild(col);
+
+//         const card = document.createElement("div");
+//         card.className = "card";
+//         col.appendChild(card);
+
+//         const cardHeader = document.createElement("h3");
+//         cardHeader.className = "card-header text-center text-style";
+//         cardHeader.style.cursor = "pointer";
+//         card.appendChild(cardHeader);
+
+//         const img = document.createElement("img");
+//         img.src = streamer.profile_image_url;
+//         img.style.maxWidth = "100%";
+//         img.alt = `${streamer.display_name}'s profile picture`;
+//         cardHeader.appendChild(img);
+//         cardHeader.appendChild(document.createElement("br"));
+//         cardHeader.appendChild(document.createTextNode(streamer.display_name));
+
+//         const center = document.createElement("center");
+//         card.appendChild(center);
+
+//         const followButton = document.createElement("a");
+//         followButton.href = `https://www.twitch.tv/${streamer.login}`;
+//         followButton.target = "_blank";
+//         center.appendChild(followButton);
+
+//         const button = document.createElement("button");
+//         button.className = "btn btn-primary btn-lg copyIp mb-3 text-uppercase font-weight-bold";
+//         button.style.border = "0px";
+//         button.style.borderBottom = "2px";
+//         button.textContent = "Twitch";
+//         followButton.appendChild(button);
+
+//         const description = document.createElement("p");
+//         description.textContent = streamer.description;
+//         card.appendChild(description);
+//     });
+// }
 
 
 
