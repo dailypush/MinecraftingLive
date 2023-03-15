@@ -112,6 +112,16 @@
 					<h1 class="display-5 fw-bold text-white">Currently Streaming</h1>
 					<div class="col-lg-6 mx-auto">
 						<!-- sample -->
+						<h1>Active Minecraft Streamers on Twitch</h1>
+						<div id="streamers"></div>
+						<script>
+							async function fetchMinecraftStreamers() {
+								const response = await fetch("/api/getMinecraftStreamers");
+								const streamers = await response.json();
+								displayStreamers(streamers);
+							}
+							</script>
+						
 						<div id="twitch-embed"></div>
 					
 						<!-- Create a Twitch.Embed object that will render within the "twitch-embed" element. -->
