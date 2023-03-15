@@ -82,9 +82,13 @@ async function getStreamerByUsername(username, accessToken) {
         "Authorization": `Bearer ${accessToken}`,
     };
 
-    const response = await axios.get(`https://api.twitch.tv/helix/users?login=${username}`, {
-        headers,
-    });
+    const [userResponse, streamResponse] = await Promise.all([
+        axios.get(`https://api.twitch.tv/helix/users?login=${username}`, { headers }),
+        axios.get(`https://api.twitch.tv/helix/streams?user_login=${username}`, { headers }),
+    ]);
 
-    return response.data.data[0];
+    const streamer = userResponse.data.data[0];
+    streamer.isLive = streamResponse.data.data.length > 0;
+
+    return streamer;
 }

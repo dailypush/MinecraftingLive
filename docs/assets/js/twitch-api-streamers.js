@@ -44,6 +44,13 @@ function displayFeaturedStreamers(streamers) {
         cardBody.className = "card-body d-flex flex-column";
         card.appendChild(cardBody);
 
+        if (streamer.isLive) {
+            const liveBadge = document.createElement("span");
+            liveBadge.className = "live-badge";
+            liveBadge.textContent = "LIVE";
+            card.appendChild(liveBadge);
+        }
+
         const name = document.createElement("h5");
         name.className = "card-title";
         name.textContent = streamer.display_name;
@@ -62,10 +69,6 @@ function displayFeaturedStreamers(streamers) {
         followButton.textContent = "Follow on Twitch";
         cardBody.appendChild(followButton);
 
-        // const cardFooter = document.createElement("div");
-        // cardFooter.className = "card-footer text-center";
-        // cardFooter.textContent = `Followers: ${streamer.followers}`;
-        // card.appendChild(cardFooter);
     });
 }
 
