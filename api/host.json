@@ -6,10 +6,28 @@
         "isEnabled": true,
         "excludedTypes": "Request"
       }
+    },
+    "logLevel": {
+      "default": "Information",
+      "Function": "Error",
+      "Host.Results": "Error",
+      "Function.MyFunctionName.User": "Trace"
     }
   },
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[3.*, 4.0.0)"
+    "version": "[2.*, 3.0.0)"
+  },
+  "extensions": {
+    "http": {
+      "routePrefix": "api",
+      "maxConcurrentRequests": 5,
+      "maxOutstandingRequests": 30
+    },
+    "queues": {
+      "maxPollingInterval": "00:00:05",
+      "visibilityTimeout": "00:00:30",
+      "batchSize": 4
+    }
   }
 }
