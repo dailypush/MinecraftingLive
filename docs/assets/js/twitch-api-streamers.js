@@ -1,67 +1,83 @@
-const featuredStreamersUsernames = ["Waldo0120", "Streamer2", "Streamer3"]; // Replace with your desired streamers' usernames
+const featuredStreamersUsernames = ["Waldo0120", "Rainbowpaint", "Streamer3"]; // Replace with your desired streamers' usernames
 
 async function fetchFeaturedStreamers() {
-    const streamers = await Promise.all(featuredStreamersUsernames.map(async (username) => {
-        const response = await fetch(`/api/getStreamerByUsername?username=${username}`);
-        const streamer = await response.json();
-        return streamer;
-    }));
-    displayFeaturedStreamers(streamers);
+    try {
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const streamers = [];
+
+        for (const username of featuredStreamersUsernames) {
+            const response = await fetch(`/api/twitchApiHandler?action=getStreamerByUsername&username=${username}`);
+            const streamer = await response.json();
+            streamers.push(streamer);
+            await delay(200); // Add a delay of 200ms between requests
+        }
+
+        displayFeaturedStreamers(streamers);
+    } catch (error) {
+        console.error(`Error fetching featured streamers: ${error.message}`);
+    }
 }
 
-function displayFeaturedStreamers(streamers) {
-    const featuredStreamersContainer = document.getElementById("featuredStreamers");
 
-    streamers.forEach(streamer => {
+
+function displayFeaturedStreamers(streamers) {
+    const featuredStreamersContainer = document.getElementById("featured-streamers");
+
+    streamers.forEach((streamer) => {
         const col = document.createElement("div");
-        col.className = "col";
+        col.className = "col-md-4 d-flex align-items-stretch mb-3";
+        featuredStreamersContainer.appendChild(col);
 
         const card = document.createElement("div");
-        card.className = "card h-100";
+        card.className = "card d-flex flex-column align-items-center text-center";
+        col.appendChild(card);
+
+        const img = document.createElement("img");
+        img.src = streamer.profile_image_url;
+        img.className = "card-img-top rounded-circle mt-3";
+        img.style.width = "100px";
+        img.style.height = "100px";
+        img.alt = `${streamer.display_name}'s profile picture`;
+        card.appendChild(img);
 
         const cardBody = document.createElement("div");
-        cardBody.className = "card-body";
+        cardBody.className = "card-body d-flex flex-column";
+        card.appendChild(cardBody);
 
-        const cardTitle = document.createElement("h5");
-        cardTitle.className = "card-title";
-        cardTitle.textContent = streamer.display_name;
+        const name = document.createElement("h5");
+        name.className = "card-title";
+        name.textContent = streamer.display_name;
+        cardBody.appendChild(name);
 
-        // Add profile image
-        const profileImage = document.createElement("img");
-        profileImage.src = streamer.profile_image_url;
-        profileImage.className = "rounded-circle mb-3";
-        profileImage.style.width = "64px";
-        profileImage.style.height = "64px";
-
-        // Add Twitch description
         const description = document.createElement("p");
         description.className = "card-text";
         description.textContent = streamer.description;
-
-        // Add custom follow button
-        const followButton = document.createElement("a");
-        followButton.href = `https://www.twitch.tv/${streamer.login}`;
-        followButton.target = "_blank";
-        followButton.className = "btn btn-primary mt-3";
-        followButton.textContent = `Follow ${streamer.display_name}`;
-
-        cardBody.appendChild(profileImage);
-        cardBody.appendChild(cardTitle);
         cardBody.appendChild(description);
-        cardBody.appendChild(followButton); // Append custom follow button to cardBody
-        card.appendChild(cardBody);
-        col.appendChild(card);
-        featuredStreamersContainer.appendChild(col);
+
+        const followButton = document.createElement("a");
+        followButton.href = `https://www.twitch.tv/${streamer.login}?sr=a`;
+        followButton.target = "_blank";
+        followButton.rel = "noopener noreferrer";
+        followButton.className = "btn btn-primary mt-auto";
+        followButton.textContent = "Follow on Twitch";
+        cardBody.appendChild(followButton);
     });
 }
 
 
-async function fetchMinecraftStreamers() {
-    const response = await fetch("/api/getMinecraftStreamers");
-    const streamers = await response.json();
-    displayStreamers(streamers);
-}
 
+
+
+async function fetchMinecraftStreamers() {
+    try {
+        const response = await fetch("/api/getMinecraftStreamers");
+        // const response = await fetch("/api/twitchApiHandler?action=getMinecraftStreamers");
+        const streamers = await response.json();
+        displayStreamers(streamers);
+    } catch (error) {
+        console.error(`Error fetching Minecraft streamers: ${error.message}`);
+    }
+}
 function displayStreamers(streamers) {
     const streamersContainer = document.getElementById("streamers");
 
