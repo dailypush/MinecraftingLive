@@ -1,4 +1,4 @@
-const featuredStreamersUsernames = ["Waldo0120", "Rainbowpaint", "SullivarN"]; // Replace with your desired streamers' usernames
+const featuredStreamersUsernames = ["Waldo0120", "Rainbowpaint", "Dailypush"]; // Replace with your desired streamers' usernames
 
 async function fetchFeaturedStreamers() {
     try {
