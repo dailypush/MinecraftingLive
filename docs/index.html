@@ -109,6 +109,9 @@
 								<li class="list-group-item">Status <span
 										class="pull-right badge badge-success text-uppercase" id="status">...</span>
 								</li>
+								<li class="list-group-item">Version <span
+									class="pull-right badge text-uppercase" id="version">...</span>
+							</li>
 								<li class="list-group-item">Players <span
 										class="pull-right font-weight-bold text-uppercase" id="players">...</span></li>
 								</li>
@@ -192,6 +195,7 @@
 			}
 
 			document.querySelector('#status').innerHTML = status.online ? 'Online' : 'Offline';
+			document.querySelector('#version').innerHTML = status.server.name;
 			document.querySelector('#players').innerHTML = status.players.now;
 		});
 	</script>

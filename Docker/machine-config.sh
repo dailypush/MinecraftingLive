@@ -12,6 +12,19 @@ sudo docker pull mide/minecraft-overviewer:latest
 sudo docker pull 
 sudo chown -R opc:opc ./overviewer-data
 
+echo "making certs for mapswebsite"
+sudo mkdir certs
+sudo mkdir certbot-etc
+sudo mkdir certbot-www
+sudo chown -R opc:opc ./certs
+sudo chown -R opc:opc ./certbot-etc
+sudo chown -R opc:opc ./certbot-www
+
+## more manual steps needed https://github.com/wmnnd/nginx-certbot
+
+sudo docker compose run --rm certbot certonly --webroot -w /var/www/certbot --email certs@saw.dev -d map.minecrafting.live --agree-tos --no-eff-email
+
+
 echo "updating firewall"
 sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
