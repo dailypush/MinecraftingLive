@@ -1,4 +1,3 @@
-# docker-compose.yml
 version: "3.3"
 
 services:
@@ -8,36 +7,38 @@ services:
       - 25565:25565
     environment:
       EULA: "TRUE"
-
       SERVER_NAME: "Our Minecraft Server"
       MOTD: "First Peaceful World"
-
       DIFFICULTY: "normal"
-
-      # https://github.com/itzg/docker-minecraft-server#memory-limit
       MEMORY: 3G
-
-      # uncomment this to import a saved game. (put your savegame directory in the saves-to-import directory)
-      # WORLD: "/worlds/My-World"
-
     volumes:
       - ./minecraft-data:/data
       - ./saves-to-import:/worlds:ro
 
   backups:
     image: itzg/mc-backup
+    depends_on:
+      - mc
     environment:
       BACKUP_INTERVAL: "2h"
-      # instead of network_mode below, could declare RCON_HOST
-      # RCON_HOST: mc
     volumes:
-      # mount the same volume used by server, but read-only
       - ./minecraft-data:/data:ro
-      # use a host attached directory so that it in turn can be backed up
-      # to external/cloud storage
       - ./mc-backups:/backups:rw
-    # share network namespace with server to simplify rcon access
     network_mode: "service:mc"
+
+  overviewer:
+    image: mide/minecraft-overviewer:latest
+    depends_on:
+      - mc
+    environment:
+      - CONFIG_PATH=/config/overviewer_config.py
+      - CRON_SCHEDULE=*/12 * * * *
+      - MINECRAFT_VERSION=latest
+    volumes:
+      - ./minecraft-data/world:/home/minecraft/server/world:ro
+      - ./overviewer-data:/home/minecraft/render/:rw 
+      - ./data/overview/overviewer_config.py:/config/overviewer_config.py:ro
+    restart: unless-stopped
 
   nginx:
     image: nginx:stable-alpine

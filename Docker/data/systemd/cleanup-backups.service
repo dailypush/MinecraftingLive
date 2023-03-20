@@ -1,0 +1,6 @@
+[Unit]
+Description=Cleanup Minecraft backups older than 4 days
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'sudo find /home/opc/minecraft-docker/mc-backups -type f -mtime +3 -name "*.tgz" -exec echo "Deleting {}" \; -exec rm {} \;'
