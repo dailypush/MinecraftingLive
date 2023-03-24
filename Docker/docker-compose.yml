@@ -32,13 +32,13 @@ services:
       - mc
     environment:
       - CONFIG_PATH=/config/overviewer_config.py
-      - CRON_SCHEDULE=*/12 * * * *
+      - CRON_SCHEDULE=0 */12 * * *
       - MINECRAFT_VERSION=latest
     volumes:
       - ./minecraft-data/world:/home/minecraft/server/world:ro
       - ./overviewer-data:/home/minecraft/render/:rw 
       - ./data/overview/overviewer_config.py:/config/overviewer_config.py:ro
-    restart: unless-stopped
+    restart: on-failure:5
 
   nginx:
     image: nginx:stable-alpine

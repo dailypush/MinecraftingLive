@@ -9,7 +9,9 @@ sudo docker run hello-world
 echo "installing minecraft docker"
 sudo mkdir minecraft-docker
 sudo docker pull mide/minecraft-overviewer:latest
-sudo docker pull 
+sudo docker pull
+cd mincraft-docker
+sudo mkdir overviewer-data 
 sudo chown -R opc:opc ./overviewer-data
 
 echo "making certs for mapswebsite"
