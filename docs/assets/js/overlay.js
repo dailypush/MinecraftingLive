@@ -1,4 +1,4 @@
-d3.json("data.json").then((data) => {
+d3.json("assets/data.json").then((data) => {
     // Populate the dropdown menu with player names
     const playerSelect = d3.select("#player-select");
     playerSelect.selectAll("option")
