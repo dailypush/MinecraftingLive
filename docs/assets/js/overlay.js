@@ -1,58 +1,69 @@
-// Sample data representing the number of blocks mined by a player
-const data = [
-    {block: 'Stone', count: 150},
-    {block: 'Dirt', count: 100},
-    {block: 'Wood', count: 75},
-    {block: 'Iron', count: 25},
-    {block: 'Diamond', count: 10}
-];
+d3.json("/assets/data.json").then((data) => {
+    // Populate the dropdown menu with player names
+    const playerSelect = d3.select("#player-select");
+    playerSelect.selectAll("option")
+        .data(data)
+        .enter()
+        .append("option")
+        .attr("value", d => d.player)
+        .text(d => d.player);
 
-// Dimensions for the chart
-const width = 280;
-const height = 200;
-const margin = {top: 20, right: 20, bottom: 30, left: 40};
+    // Set up the container and dimensions
+    const container = d3.select("#stats-graph");
+    const width = container.node().getBoundingClientRect().width;
+    const height = container.node().getBoundingClientRect().height;
 
-// Create the SVG container for the chart
-const svg = d3.select("#chart")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    // Create the SVG element
+    const svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-// Set up scales for the chart
-const x = d3.scaleBand()
-    .domain(data.map(d => d.block))
-    .range([0, width])
-    .padding(0.1);
-const y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.count)])
-    .range([height, 0]);
+    // Function to update the graph
+    function updateGraph(player) {
+        // Clear the SVG
+        svg.selectAll("*").remove();
 
-// Create the bars for the chart
-svg.selectAll(".bar")
-    .data(data)
-    .enter()
-    .append("rect")
-    .attr("class", "bar")
-    .attr("x", d => x(d.block))
-    .attr("width", x.bandwidth())
-    .attr("y", d => y(d.count))
-    .attr("height", d => height - y(d.count))
-    .attr("fill", "#86795a");  // Minecraft grass block color
+        // If no player is selected, don't display anything
+        if (!player) return;
 
-// Add the X-axis
-svg.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x));
+        // Filter data for the selected player
+        const playerData = data.filter(d => d.player === player)[0].blocksMined;
 
-// Add the Y-axis
-svg.append("g")
-    .call(d3.axisLeft(y));
+        // Create a simple bar chart for player-specific block types mined
+        const blockTypes = Object.keys(playerData);
+        const xScale = d3.scaleBand()
+            .domain(blockTypes)
+            .range([0, width])
+            .padding(0.1);
 
-// Add chart title
-svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", -10)
-    .attr("text-anchor", "middle")
-    .text("Blocks Mined");
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(blockTypes, blockType => playerData[blockType])])
+            .range([height, 0]);
+
+        svg.selectAll(".bar")
+            .data(blockTypes)
+            .enter()
+            .append("rect")
+            .attr("class", "bar")
+            .attr("x", blockType => xScale(blockType))
+            .attr("y", blockType => yScale(playerData[blockType]))
+            .attr("width", xScale.bandwidth())
+            .attr("height", blockType => height - yScale(playerData[blockType]))
+            .attr("fill", "steelblue");
+
+        // Add the x-axis
+        svg.append("g")
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(xScale));
+
+        // Add the y-axis
+        svg.append("g")
+            .call(d3.axisLeft(yScale));
+    }
+
+    // Update the graph when the player selection changes
+    playerSelect.on("change", function() {
+        const player = d3.select(this).property("value");
+        updateGraph(player);
+    });
+});

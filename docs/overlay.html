@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Minecraft Stats Twitch Overlay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Stats Page</title>
     <link rel="stylesheet" href="assets/style/css/overlay.css">
-    <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
-    <div class="overlay-container">
-        <h2>Minecraft Stats</h2>
-        <div id="chart"></div>
-    </div>
+    <select id="player-select">
+        <option value="">Select a player</option>
+    </select>
+    <div id="stats-graph"></div>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="assets/js/overlay.js"></script>
 </body>
 </html>

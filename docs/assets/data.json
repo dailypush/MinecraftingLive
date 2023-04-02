@@ -1,0 +1,14 @@
+[
+    {
+        "player": "Player1",
+        "blocksMined": {"stone": 300, "dirt": 200, "wood": 100, "sand": 50, "gravel": 20}
+    },
+    {
+        "player": "Player2",
+        "blocksMined": {"stone": 250, "dirt": 150, "wood": 120, "sand": 80, "gravel": 40}
+    },
+    {
+        "player": "Player3",
+        "blocksMined": {"stone": 350, "dirt": 220, "wood": 90, "sand": 30, "gravel": 60}
+    }
+]
