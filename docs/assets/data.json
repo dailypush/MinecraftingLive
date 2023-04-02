@@ -1,14 +1,41 @@
 [
     {
         "player": "Player1",
-        "blocksMined": {"stone": 300, "dirt": 200, "wood": 100, "sand": 50, "gravel": 20}
+        "kills": 10,
+        "deaths": 5,
+        "playtime": 120,
+        "blocksMined": {"stone": 300, "dirt": 200, "wood": 100, "sand": 50, "gravel": 20},
+        "itemsCrafted": 30,
+        "mobKills": {"zombie": 15, "skeleton": 10, "creeper": 5},
+        "distanceWalked": 5000,
+        "distanceFlown": 1000,
+        "animalsBred": 10,
+        "enchantedItems": 5
     },
     {
         "player": "Player2",
-        "blocksMined": {"stone": 250, "dirt": 150, "wood": 120, "sand": 80, "gravel": 40}
+        "kills": 8,
+        "deaths": 6,
+        "playtime": 150,
+        "blocksMined": {"stone": 250, "dirt": 150, "wood": 120, "sand": 80, "gravel": 40},
+        "itemsCrafted": 20,
+        "mobKills": {"zombie": 20, "skeleton": 15, "creeper": 10},
+        "distanceWalked": 4000,
+        "distanceFlown": 2000,
+        "animalsBred": 15,
+        "enchantedItems": 10
     },
     {
         "player": "Player3",
-        "blocksMined": {"stone": 350, "dirt": 220, "wood": 90, "sand": 30, "gravel": 60}
+        "kills": 15,
+        "deaths": 10,
+        "playtime": 90,
+        "blocksMined": {"stone": 350, "dirt": 220, "wood": 90, "sand": 30, "gravel": 60},
+        "itemsCrafted": 40,
+        "mobKills": {"zombie": 10, "skeleton": 5, "creeper": 7},
+        "distanceWalked": 6000,
+        "distanceFlown": 1500,
+        "animalsBred": 8,
+        "enchantedItems": 3
     }
 ]

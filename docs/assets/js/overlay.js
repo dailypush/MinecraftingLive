@@ -1,4 +1,4 @@
-d3.json("/assets/data.json").then((data) => {
+d3.json("data.json").then((data) => {
     // Populate the dropdown menu with player names
     const playerSelect = d3.select("#player-select");
     playerSelect.selectAll("option")
@@ -8,53 +8,91 @@ d3.json("/assets/data.json").then((data) => {
         .attr("value", d => d.player)
         .text(d => d.player);
 
-    // Set up the container and dimensions
-    const container = d3.select("#stats-graph");
-    const width = container.node().getBoundingClientRect().width;
-    const height = container.node().getBoundingClientRect().height;
+    // Set up the containers and dimensions
+    const containerSize = { width: 400, height: 300 };
 
-    // Create the SVG element
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    const killsDeathsContainer = d3.select("#kills-deaths-graph");
+    const blocksMinedContainer = d3.select("#blocks-mined-graph");
+    const mobKillsContainer = d3.select("#mob-kills-graph");
 
-    // Function to update the graph
+    // Create the SVG elements
+    const killsDeathsSvg = createSvg(killsDeathsContainer, containerSize);
+    const blocksMinedSvg = createSvg(blocksMinedContainer, containerSize);
+    const mobKillsSvg = createSvg(mobKillsContainer, containerSize);
+
+    // Helper function to create SVG elements
+    function createSvg(container, size) {
+        return container.append("svg")
+            .attr("width", size.width)
+            .attr("height", size.height);
+    }
+
+    // Function to update the graphs
     function updateGraph(player) {
-        // Clear the SVG
-        svg.selectAll("*").remove();
+        // Clear the SVGs
+        killsDeathsSvg.selectAll("*").remove();
+        blocksMinedSvg.selectAll("*").remove();
+        mobKillsSvg.selectAll("*").remove();
 
         // If no player is selected, don't display anything
         if (!player) return;
 
         // Filter data for the selected player
-        const playerData = data.filter(d => d.player === player)[0].blocksMined;
+        const playerData = data.filter(d => d.player === player)[0];
 
-        // Create a simple bar chart for player-specific block types mined
-        const blockTypes = Object.keys(playerData);
+        // Update kills/deaths graph
+        createBarGraph(
+            killsDeathsSvg,
+            containerSize,
+            ["kills", "deaths"],
+            ["Kills", "Deaths"],
+            [playerData.kills, playerData.deaths]
+        );
+
+        // Update blocks mined graph
+        createBarGraph(
+            blocksMinedSvg,
+            containerSize,
+            Object.keys(playerData.blocksMined),
+            Object.keys(playerData.blocksMined),
+            Object.values(playerData.blocksMined)
+        );
+
+        // Update mob kills graph
+        createBarGraph(
+            mobKillsSvg,
+            containerSize,
+            Object.keys(playerData.mobKills),
+            Object.keys(playerData.mobKills),
+            Object.values(playerData.mobKills)
+        );
+    }
+    // Function to create a bar graph
+    function createBarGraph(svg, size, categories, labels, values) {
         const xScale = d3.scaleBand()
-            .domain(blockTypes)
-            .range([0, width])
+            .domain(categories)
+            .range([0, size.width])
             .padding(0.1);
 
         const yScale = d3.scaleLinear()
-            .domain([0, d3.max(blockTypes, blockType => playerData[blockType])])
-            .range([height, 0]);
+            .domain([0, d3.max(values)])
+            .range([size.height, 0]);
 
         svg.selectAll(".bar")
-            .data(blockTypes)
+            .data(values)
             .enter()
             .append("rect")
             .attr("class", "bar")
-            .attr("x", blockType => xScale(blockType))
-            .attr("y", blockType => yScale(playerData[blockType]))
+            .attr("x", (_, i) => xScale(categories[i]))
+            .attr("y", d => yScale(d))
             .attr("width", xScale.bandwidth())
-            .attr("height", blockType => height - yScale(playerData[blockType]))
+            .attr("height", d => size.height - yScale(d))
             .attr("fill", "steelblue");
 
         // Add the x-axis
         svg.append("g")
-            .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(xScale));
+            .attr("transform", `translate(0, ${size.height})`)
+            .call(d3.axisBottom(xScale).tickFormat((_, i) => labels[i]));
 
         // Add the y-axis
         svg.append("g")
@@ -62,8 +100,9 @@ d3.json("/assets/data.json").then((data) => {
     }
 
     // Update the graph when the player selection changes
-    playerSelect.on("change", function() {
+    playerSelect.on("change", function () {
         const player = d3.select(this).property("value");
         updateGraph(player);
     });
 });
+
