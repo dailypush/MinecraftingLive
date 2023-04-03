@@ -2,7 +2,7 @@ d3.json("assets/data.json").then((players) => {
     // Populate the dropdown menu with player names
     const playerSelect = d3.select("#player-select");
     playerSelect.selectAll("option")
-        .data(data)
+        .data(players)
         .enter()
         .append("option")
         .attr("value", d => d.player)
@@ -11,10 +11,16 @@ d3.json("assets/data.json").then((players) => {
     // Set up the containers and dimensions
     const containerSize = { width: 400, height: 300 };
 
+    const killsDeathsContainer = d3.select("#kills-deaths-graph");
+    const blocksMinedContainer = d3.select("#blocks-mined-graph");
+    const mobKillsContainer = d3.select("#mob-kills-graph");
+    const customBlocksMinedContainer = d3.select("#custom-blocks-mined-graph");
+
+    // Create the SVG elements
     const killsDeathsSvg = createSvg(killsDeathsContainer, containerSize);
     const blocksMinedSvg = createSvg(blocksMinedContainer, containerSize);
     const mobKillsSvg = createSvg(mobKillsContainer, containerSize);
-    const customBlocksMinedSvg = d3.select("#custom-blocks-mined-graph").append("svg").attr("width", containerSize.width).attr("height", containerSize.height);
+    const customBlocksMinedSvg = createSvg(customBlocksMinedContainer, containerSize);
 
     const blockColors = {
         "stone": "#A9A9A9",
@@ -23,7 +29,6 @@ d3.json("assets/data.json").then((players) => {
         "sand": "#F4A460",
         "gravel": "#808080"
     };
-
 
     // Helper function to create SVG elements
     function createSvg(container, size) {
@@ -43,7 +48,7 @@ d3.json("assets/data.json").then((players) => {
         if (!player) return;
 
         // Filter data for the selected player
-        const playerData = data.filter(d => d.player === player)[0];
+        const playerData = players.filter(d => d.player === player)[0];
 
         // Update kills/deaths graph
         createBarGraph(
@@ -64,7 +69,6 @@ d3.json("assets/data.json").then((players) => {
             blockColors
         );
 
-
         // Update mob kills graph
         createBarGraph(
             mobKillsSvg,
@@ -74,6 +78,7 @@ d3.json("assets/data.json").then((players) => {
             Object.values(playerData.mobKills)
         );
     }
+
     // Function to create a bar graph
     function createBarGraph(svg, size, categories, labels, values, colors = null, duration = 1000) {
         const yScale = d3.scaleBand()
@@ -123,6 +128,12 @@ d3.json("assets/data.json").then((players) => {
             .call(d3.axisBottom(xScale));
     }
 
+    // Update the graph when the player selection changes
+    playerSelect.on("change", function () {
+        const player = d3.select(this).property("value");
+        updateGraph(player);
+    });
+
     // variable to store the selected block types
     const customBlocksMined = [];
 
@@ -156,10 +167,5 @@ d3.json("assets/data.json").then((players) => {
         }
         blockSelect.value = '';
     });
-    // Update the graph when the player selection changes
-    playerSelect.on("change", function () {
-        const player = d3.select(this).property("value");
-        updateGraph(player);
-    });
-});
 
+});
