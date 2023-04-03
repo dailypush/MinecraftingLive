@@ -124,12 +124,9 @@ d3.json("assets/data.json").then((players) => {
             .range([0, size.height])
             .padding(0.1);
     
-        //xScale definition here
         const xScale = d3.scaleLinear()
             .domain([0, d3.max(values)])
             .range([0, size.width - 50]); // leave 50px padding on the right
-    }
-    
     
         const bars = svg.selectAll(".bar")
             .data(values);
