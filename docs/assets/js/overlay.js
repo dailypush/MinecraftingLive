@@ -105,6 +105,17 @@ d3.json("assets/data.json").then((players) => {
             .duration(duration)
             .attr("width", d => xScale(d));
 
+        svg.selectAll(".bar-label")
+            .data(labels)
+            .enter()
+            .append("text")
+            .attr("class", "bar-label")
+            .attr("y", (_, i) => yScale(categories[i]) + yScale.bandwidth() / 2)
+            .attr("x", -5)
+            .attr("text-anchor", "end")
+            .attr("dy", ".35em")
+            .text((d) => d);
+
         svg.selectAll(".bar-value")
             .data(values)
             .enter()
@@ -120,13 +131,14 @@ d3.json("assets/data.json").then((players) => {
 
         // Add the y-axis
         svg.append("g")
-            .call(d3.axisLeft(yScale));
+            .call(d3.axisLeft(yScale).tickFormat(''));
 
         // Add the x-axis
         svg.append("g")
             .attr("transform", `translate(0, ${size.height})`)
             .call(d3.axisBottom(xScale));
     }
+
 
     // Update the graph when the player selection changes
     playerSelect.on("change", function () {
