@@ -119,7 +119,7 @@ d3.json("assets/data.json").then((players) => {
     
         // Add the y-axis
         svg.append("g")
-            .call(d3.axisLeft(yScale)); // Removed .tickFormat('')
+            .call(d3.axisLeft(yScale).tickFormat((_, i) => labels[i]));
     
         // Add the x-axis
         svg.append("g")
