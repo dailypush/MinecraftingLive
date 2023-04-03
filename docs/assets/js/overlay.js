@@ -84,11 +84,11 @@ d3.json("assets/data.json").then((data) => {
             .domain(categories)
             .range([0, size.width])
             .padding(0.1);
-
+    
         const yScale = d3.scaleLinear()
             .domain([0, d3.max(values)])
             .range([size.height, 0]);
-
+    
         svg.selectAll(".bar")
             .data(values)
             .enter()
@@ -98,8 +98,8 @@ d3.json("assets/data.json").then((data) => {
             .attr("y", d => yScale(d))
             .attr("width", xScale.bandwidth())
             .attr("height", d => size.height - yScale(d))
-            .attr("fill", (_, i) => colors ? colors[categories[i]] : "steelblue");
-
+            .attr("fill", (_, i) => colors ? colors[labels[i]] : "steelblue");
+    
         svg.selectAll(".bar-value")
             .data(values)
             .enter()
@@ -108,18 +108,18 @@ d3.json("assets/data.json").then((data) => {
             .attr("x", (_, i) => xScale(categories[i]) + xScale.bandwidth() / 2)
             .attr("y", d => yScale(d) - 5)
             .attr("text-anchor", "middle")
-            .text(d => d);    
-            
+            .text(d => d);
+    
         // Add the x-axis
         svg.append("g")
             .attr("transform", `translate(0, ${size.height})`)
             .call(d3.axisBottom(xScale).tickFormat((_, i) => labels[i]));
-
+    
         // Add the y-axis
         svg.append("g")
             .call(d3.axisLeft(yScale));
-
     }
+    
 
     // Update the graph when the player selection changes
     playerSelect.on("change", function () {
