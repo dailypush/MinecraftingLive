@@ -47,22 +47,20 @@ d3.json("assets/data.json").then((players) => {
         killsDeathsSvg.selectAll("*").remove();
         blocksMinedSvg.selectAll("*").remove();
         mobKillsSvg.selectAll("*").remove();
-
+    
         // If no player is selected, don't display anything
         if (!player) return;
-
+    
         // Filter data for the selected player
-        const playerData = players.filter(d => d.player === player)[0];
-
+        const playerData = data.filter(d => d.player === player)[0];
+    
         // Update kills/deaths graph
-        createBarGraph(
+        createDonutChart(
             killsDeathsSvg,
             containerSize,
-            ["kills", "deaths"],
-            ["Kills", "Deaths"],
-            [playerData.kills, playerData.deaths]
+            { kills: playerData.kills, deaths: playerData.deaths }
         );
-
+    
         // Update blocks mined graph
         createBarGraph(
             blocksMinedSvg,
@@ -72,7 +70,7 @@ d3.json("assets/data.json").then((players) => {
             Object.values(playerData.blocksMined),
             blockColors
         );
-
+    
         // Update mob kills graph
         createBarGraph(
             mobKillsSvg,
@@ -82,6 +80,46 @@ d3.json("assets/data.json").then((players) => {
             Object.values(playerData.mobKills)
         );
     }
+    
+    function createDonutChart(svg, size, ratio) {
+        const radius = Math.min(size.width, size.height) / 2;
+        const arc = d3.arc()
+            .innerRadius(radius - 50)
+            .outerRadius(radius);
+    
+        const pie = d3.pie()
+            .value(d => d.value);
+    
+        const killsDeathsData = [
+            { label: "Kills", value: ratio.kills },
+            { label: "Deaths", value: ratio.deaths }
+        ];
+    
+        const colorScale = d3.scaleOrdinal()
+            .domain(killsDeathsData.map(d => d.label))
+            .range(["#1f77b4", "#d62728"]);
+    
+        const g = svg.append("g")
+            .attr("transform", `translate(${size.width / 2}, ${size.height / 2})`);
+    
+        const arcs = g.selectAll(".arc")
+            .data(pie(killsDeathsData))
+            .enter()
+            .append("g")
+            .attr("class", "arc");
+    
+        arcs.append("path")
+            .attr("d", arc)
+            .attr("fill", d => colorScale(d.data.label));
+    
+        arcs.append("text")
+            .attr("transform", d => `translate(${arc.centroid(d)})`)
+            .attr("dy", ".35em")
+            .text(d => d.data.label)
+            .attr("fill", "#fff");
+    }
+    
+
 
     function createBarGraph(svg, size, categories, labels, values, colors = null, duration = 1000) {
         const yScale = d3.scaleBand()
