@@ -104,28 +104,26 @@ d3.json("assets/data.json").then((players) => {
             .duration(duration)
             .attr("width", d => xScale(d));
     
-        svg.selectAll(".bar-value")
-            .data(values)
+        // Add x-axis labels
+        svg.selectAll(".x-axis-label")
+            .data(labels)
             .enter()
             .append("text")
-            .attr("class", "bar-value")
-            .attr("y", (_, i) => yScale(categories[i]) + yScale.bandwidth() / 2)
-            .attr("x", 5)
-            .attr("dy", ".35em")
-            .text(d => d)
-            .transition()
-            .duration(duration)
-            .attr("x", d => xScale(d) + 5);
+            .attr("class", "x-axis-label")
+            .attr("x", (_, i) => xScale(values[i]) + 5)
+            .attr("y", (_, i) => yScale(categories[i]) + yScale.bandwidth() / 2 + 5)
+            .text((d, i) => `${d}: ${values[i]}`);
     
         // Add the y-axis
         svg.append("g")
-            .call(d3.axisLeft(yScale).tickFormat((_, i) => labels[i]));
+            .call(d3.axisLeft(yScale));
     
         // Add the x-axis
         svg.append("g")
             .attr("transform", `translate(0, ${size.height})`)
             .call(d3.axisBottom(xScale));
     }
+    
     
 
 
