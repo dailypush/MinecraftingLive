@@ -84,14 +84,14 @@ d3.json("assets/data.json").then((data) => {
             .domain(categories)
             .range([0, size.height])
             .padding(0.1);
-    
+
         const xScale = d3.scaleLinear()
             .domain([0, d3.max(values)])
             .range([0, size.width]);
-    
+
         const bars = svg.selectAll(".bar")
             .data(values);
-    
+
         bars.enter()
             .append("rect")
             .attr("class", "bar")
@@ -103,7 +103,7 @@ d3.json("assets/data.json").then((data) => {
             .transition()
             .duration(duration)
             .attr("width", d => xScale(d));
-    
+
         svg.selectAll(".bar-value")
             .data(values)
             .enter()
@@ -116,19 +116,50 @@ d3.json("assets/data.json").then((data) => {
             .transition()
             .duration(duration)
             .attr("x", d => xScale(d) + 5);
-    
+
         // Add the y-axis
         svg.append("g")
             .call(d3.axisLeft(yScale));
-    
+
         // Add the x-axis
         svg.append("g")
             .attr("transform", `translate(0, ${size.height})`)
             .call(d3.axisBottom(xScale));
     }
-    
-    
 
+    // variable to store the selected block types
+    const customBlocksMined = [];
+
+    function updateCustomBlocksMinedGraph(playerData) {
+        const labels = customBlocksMined.map(block => block);
+        const values = customBlocksMined.map(block => playerData.blocksMined[block]);
+
+        customBlocksMinedSvg.selectAll('*').remove();
+        createBarGraph(
+            customBlocksMinedSvg,
+            containerSize,
+            customBlocksMined,
+            labels,
+            values,
+            blockColors
+        );
+    }
+
+    // event listener to update the custom chart when the user adds a new block
+    document.getElementById('custom-blocks-mined-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const blockSelect = document.getElementById('block-select');
+        const block = blockSelect.value;
+
+        if (block && !customBlocksMined.includes(block)) {
+            customBlocksMined.push(block);
+            const selectedPlayer = playerSelect.property('value');
+            if (selectedPlayer) {
+                updateCustomBlocksMinedGraph(players[selectedPlayer]);
+            }
+        }
+        blockSelect.value = '';
+    });
     // Update the graph when the player selection changes
     playerSelect.on("change", function () {
         const player = d3.select(this).property("value");

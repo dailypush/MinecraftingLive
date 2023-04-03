@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/style/css/overlay.css">
 </head>
+
 <body>
     <div class="container">
         <h1 class="text-center my-4">Minecraft Player Statistics</h1>
@@ -16,7 +18,56 @@
                 <option value="">Choose...</option>
             </select>
         </div>
+        <!-- Add this inside the <div class="row"> element -->
+        <div class="col-md-4">
+            <h3>Custom Blocks Mined</h3>
+            <form id="custom-blocks-mined-form">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="stone" id="stone">
+                    <label class="form-check-label" for="stone">Stone</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="dirt" id="dirt">
+                    <label class="form-check-label" for="dirt">Dirt</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="wood" id="wood">
+                    <label class="form-check-label" for="wood">Wood</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="sand" id="sand">
+                    <label class="form-check-label" for="sand">Sand</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="gravel" id="gravel">
+                    <label class="form-check-label" for="gravel">Gravel</label>
+                </div>
+            </form>
+            <div id="custom-blocks-mined-graph" class="graph-container"></div>
+        </div>
+
         <div class="row">
+            <div class="col-md-4">
+                <h3>Custom Blocks Mined</h3>
+                <!-- Replace the existing form inside the <div class="col-md-4"> element -->
+                <form id="custom-blocks-mined-form">
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="block-select">Add block:</label>
+                        <input type="text" class="form-control" id="block-select" list="block-options">
+                        <datalist id="block-options">
+                            <option value="stone">
+                            <option value="dirt">
+                            <option value="wood">
+                            <option value="sand">
+                            <option value="gravel">
+                        </datalist>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+
+                <div id="custom-blocks-mined-graph" class="graph-container"></div>
+            </div>
+
             <div class="col-md-4">
                 <h3>Kills/Deaths</h3>
                 <div id="kills-deaths-graph" class="graph-container"></div>
@@ -36,4 +87,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="assets/js/overlay.js"></script>
 </body>
+
 </html>
