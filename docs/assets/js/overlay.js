@@ -7,6 +7,8 @@ const BLOCK_COLORS = {
   gravel: "#808080",
 };
 
+
+
 function createSvg(container, size) {
   return container.append("svg").attr("width", size.width).attr("height", size.height);
 }
@@ -152,19 +154,36 @@ function updateGraph(player, data, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg
   createBarGraph(mobKillsSvg, CONTAINER_SIZE, Object.keys(playerData.mobKills), Object.values(playerData.mobKills));
 }
 
+async function loadPlayersData() {
+    try {
+      const players = await d3.json("assets/data.json");
+      return players;
+    } catch (error) {
+      console.error("Error loading data:", error);
+      return null;
+    }
+  }
+  
+
 (async function main() {
-  const players = await d3.json("assets/data.json");
-
-  // Initialize UI elements
-  populateDropdownMenu(players);
-  const { killsDeathsSvg, blocksMinedSvg, mobKillsSvg, customBlocksMinedSvg } = createGraphs();
-
-  // Event listeners
-  const playerSelect = d3.select("#player-select");
-  playerSelect.on("change", function () {
-    const player = d3.select(this).property("value");
-    updateGraph(player, players, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg });
-  });
+    try {
+      const players = await loadPlayersData();
+  
+      if (!players) {
+        console.error("Unable to load player data.");
+        return;
+      }
+  
+      // Initialize UI elements
+      populateDropdownMenu(players);
+      const { killsDeathsSvg, blocksMinedSvg, mobKillsSvg, customBlocksMinedSvg } = createGraphs();
+  
+      // Event listeners
+      const playerSelect = d3.select("#player-select");
+      playerSelect.on("change", function () {
+        const player = d3.select(this).property("value");
+        updateGraph(player, players, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg });
+      });
 
 
  // event listener to update the custom chart when the user adds a new block
@@ -184,7 +203,9 @@ function updateGraph(player, data, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg
     blockSelect.value = '';
 });
 
-
+} catch (error) {
+    console.error("An error occurred:", error);
+  }
 })();
 
 
