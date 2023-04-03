@@ -9,7 +9,11 @@ d3.json("assets/data.json").then((players) => {
         .text(d => d.player);
 
     // Set up the containers and dimensions
-    const containerSize = { width: 400, height: 300 };
+    const containerSize = { width: 500, height: 300 };
+    const xScale = d3.scaleLinear()
+    .domain([0, d3.max(values)])
+    .range([0, size.width - 50]); // leave 50px padding on the right
+
 
     const killsDeathsContainer = d3.select("#kills-deaths-graph");
     const blocksMinedContainer = d3.select("#blocks-mined-graph");
@@ -87,7 +91,7 @@ d3.json("assets/data.json").then((players) => {
     
         const xScale = d3.scaleLinear()
             .domain([0, d3.max(values)])
-            .range([0, size.width]);
+            .range([0, size.width - 50]); // leave 50px padding on the right
     
         const bars = svg.selectAll(".bar")
             .data(values);
@@ -123,6 +127,7 @@ d3.json("assets/data.json").then((players) => {
             .attr("transform", `translate(0, ${size.height})`)
             .call(d3.axisBottom(xScale));
     }
+    
     
     
 
