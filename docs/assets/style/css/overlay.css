@@ -7,3 +7,8 @@
 .bar {
     fill: steelblue;
 }
+
+.bar-value {
+    font-size: 12px;
+    fill: #333;
+}

@@ -20,6 +20,15 @@ d3.json("assets/data.json").then((data) => {
     const blocksMinedSvg = createSvg(blocksMinedContainer, containerSize);
     const mobKillsSvg = createSvg(mobKillsContainer, containerSize);
 
+    const blockColors = {
+        "stone": "#A9A9A9",
+        "dirt": "#8B4513",
+        "wood": "#A0522D",
+        "sand": "#F4A460",
+        "gravel": "#808080"
+    };
+
+
     // Helper function to create SVG elements
     function createSvg(container, size) {
         return container.append("svg")
@@ -55,8 +64,10 @@ d3.json("assets/data.json").then((data) => {
             containerSize,
             Object.keys(playerData.blocksMined),
             Object.keys(playerData.blocksMined),
-            Object.values(playerData.blocksMined)
+            Object.values(playerData.blocksMined),
+            blockColors
         );
+
 
         // Update mob kills graph
         createBarGraph(
@@ -68,7 +79,7 @@ d3.json("assets/data.json").then((data) => {
         );
     }
     // Function to create a bar graph
-    function createBarGraph(svg, size, categories, labels, values) {
+    function createBarGraph(svg, size, categories, labels, values, colors = null) {
         const xScale = d3.scaleBand()
             .domain(categories)
             .range([0, size.width])
@@ -87,8 +98,18 @@ d3.json("assets/data.json").then((data) => {
             .attr("y", d => yScale(d))
             .attr("width", xScale.bandwidth())
             .attr("height", d => size.height - yScale(d))
-            .attr("fill", "steelblue");
+            .attr("fill", (_, i) => colors ? colors[categories[i]] : "steelblue");
 
+        svg.selectAll(".bar-value")
+            .data(values)
+            .enter()
+            .append("text")
+            .attr("class", "bar-value")
+            .attr("x", (_, i) => xScale(categories[i]) + xScale.bandwidth() / 2)
+            .attr("y", d => yScale(d) - 5)
+            .attr("text-anchor", "middle")
+            .text(d => d);    
+            
         // Add the x-axis
         svg.append("g")
             .attr("transform", `translate(0, ${size.height})`)
@@ -97,6 +118,7 @@ d3.json("assets/data.json").then((data) => {
         // Add the y-axis
         svg.append("g")
             .call(d3.axisLeft(yScale));
+
     }
 
     // Update the graph when the player selection changes
