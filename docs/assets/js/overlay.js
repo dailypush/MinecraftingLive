@@ -1,4 +1,4 @@
-d3.json("assets/data.json").then((data) => {
+d3.json("assets/data.json").then((players) => {
     // Populate the dropdown menu with player names
     const playerSelect = d3.select("#player-select");
     playerSelect.selectAll("option")
@@ -11,14 +11,10 @@ d3.json("assets/data.json").then((data) => {
     // Set up the containers and dimensions
     const containerSize = { width: 400, height: 300 };
 
-    const killsDeathsContainer = d3.select("#kills-deaths-graph");
-    const blocksMinedContainer = d3.select("#blocks-mined-graph");
-    const mobKillsContainer = d3.select("#mob-kills-graph");
-
-    // Create the SVG elements
     const killsDeathsSvg = createSvg(killsDeathsContainer, containerSize);
     const blocksMinedSvg = createSvg(blocksMinedContainer, containerSize);
     const mobKillsSvg = createSvg(mobKillsContainer, containerSize);
+    const customBlocksMinedSvg = d3.select("#custom-blocks-mined-graph").append("svg").attr("width", containerSize.width).attr("height", containerSize.height);
 
     const blockColors = {
         "stone": "#A9A9A9",
