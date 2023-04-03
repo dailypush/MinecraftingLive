@@ -137,11 +137,10 @@ d3.json("assets/data.json").then((players) => {
 
     // variable to store the selected block types
     const customBlocksMined = [];
-
     function updateCustomBlocksMinedGraph(playerData) {
         const labels = customBlocksMined.map(block => block);
         const values = customBlocksMined.map(block => playerData.blocksMined[block]);
-
+    
         customBlocksMinedSvg.selectAll('*').remove();
         createBarGraph(
             customBlocksMinedSvg,
@@ -152,21 +151,24 @@ d3.json("assets/data.json").then((players) => {
             blockColors
         );
     }
+    
 
     // event listener to update the custom chart when the user adds a new block
     document.getElementById('custom-blocks-mined-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const blockSelect = document.getElementById('block-select');
         const block = blockSelect.value;
-
+    
         if (block && !customBlocksMined.includes(block)) {
             customBlocksMined.push(block);
             const selectedPlayer = playerSelect.property('value');
             if (selectedPlayer) {
-                updateCustomBlocksMinedGraph(players[selectedPlayer]);
+                const playerData = data.filter(d => d.player === selectedPlayer)[0];
+                updateCustomBlocksMinedGraph(playerData);
             }
         }
         blockSelect.value = '';
     });
+    
 
 });
