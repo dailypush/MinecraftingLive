@@ -79,46 +79,54 @@ d3.json("assets/data.json").then((data) => {
         );
     }
     // Function to create a bar graph
-    function createBarGraph(svg, size, categories, labels, values, colors = null) {
-        const xScale = d3.scaleBand()
+    function createBarGraph(svg, size, categories, labels, values, colors = null, duration = 1000) {
+        const yScale = d3.scaleBand()
             .domain(categories)
-            .range([0, size.width])
+            .range([0, size.height])
             .padding(0.1);
     
-        const yScale = d3.scaleLinear()
+        const xScale = d3.scaleLinear()
             .domain([0, d3.max(values)])
-            .range([size.height, 0]);
+            .range([0, size.width]);
     
-        svg.selectAll(".bar")
-            .data(values)
-            .enter()
+        const bars = svg.selectAll(".bar")
+            .data(values);
+    
+        bars.enter()
             .append("rect")
             .attr("class", "bar")
-            .attr("x", (_, i) => xScale(categories[i]))
-            .attr("y", d => yScale(d))
-            .attr("width", xScale.bandwidth())
-            .attr("height", d => size.height - yScale(d))
-            .attr("fill", (_, i) => colors ? colors[labels[i]] : "steelblue");
+            .attr("y", (_, i) => yScale(categories[i]))
+            .attr("x", 0)
+            .attr("height", yScale.bandwidth())
+            .attr("fill", (_, i) => colors ? colors[labels[i]] : "steelblue")
+            .attr("width", 0)
+            .transition()
+            .duration(duration)
+            .attr("width", d => xScale(d));
     
         svg.selectAll(".bar-value")
             .data(values)
             .enter()
             .append("text")
             .attr("class", "bar-value")
-            .attr("x", (_, i) => xScale(categories[i]) + xScale.bandwidth() / 2)
-            .attr("y", d => yScale(d) - 5)
-            .attr("text-anchor", "middle")
-            .text(d => d);
-    
-        // Add the x-axis
-        svg.append("g")
-            .attr("transform", `translate(0, ${size.height})`)
-            .call(d3.axisBottom(xScale).tickFormat((_, i) => labels[i]));
+            .attr("y", (_, i) => yScale(categories[i]) + yScale.bandwidth() / 2)
+            .attr("x", 5)
+            .attr("dy", ".35em")
+            .text(d => d)
+            .transition()
+            .duration(duration)
+            .attr("x", d => xScale(d) + 5);
     
         // Add the y-axis
         svg.append("g")
             .call(d3.axisLeft(yScale));
+    
+        // Add the x-axis
+        svg.append("g")
+            .attr("transform", `translate(0, ${size.height})`)
+            .call(d3.axisBottom(xScale));
     }
+    
     
 
     // Update the graph when the player selection changes
