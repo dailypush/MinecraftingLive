@@ -166,8 +166,20 @@ async function loadPlayersData() {
   }
 }
 
+function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg) {
+  const customData = customBlocksMined.map(block => ({
+    key: block,
+    value: playerData.blocksMined[block] || 0
+  }));
+
+  customBlocksMinedSvg.selectAll("*").remove();
+  createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData.map(d => d.value), BLOCK_COLORS);
+}
+
 
 (async function main() {
+  const customBlocksMined = []; 
+
   try {
     const players = await loadPlayersData();
 
@@ -193,17 +205,18 @@ async function loadPlayersData() {
       event.preventDefault();
       const blockSelect = document.getElementById('block-select');
       const block = blockSelect.value;
-
+    
       if (block && !customBlocksMined.includes(block)) {
         customBlocksMined.push(block);
         const selectedPlayer = playerSelect.property('value');
         if (selectedPlayer) {
-          const playerData = data.filter(d => d.player === selectedPlayer)[0];
-          updateCustomBlocksMinedGraph(playerData);
+          const playerData = players.filter(d => d.player === selectedPlayer)[0];
+          updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg); // Pass the customBlocksMinedSvg here
         }
       }
       blockSelect.value = '';
     });
+    
 
   } catch (error) {
     console.error("An error occurred:", error);
