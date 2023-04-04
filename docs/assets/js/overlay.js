@@ -167,10 +167,15 @@ async function loadPlayersData() {
 }
 
 function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg, customBlocksMined) {
-  const customData = customBlocksMined.map(block => playerData.blocksMined[block] || 0);
+  const customData = customBlocksMined.map(block => ({
+    key: block,
+    value: playerData.blocksMined[block] || 0
+  }));
+
   customBlocksMinedSvg.selectAll("*").remove();
   createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData.map(d => d.value), BLOCK_COLORS);
 }
+
 
 
 (async function main() {
