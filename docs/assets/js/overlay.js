@@ -166,11 +166,13 @@ async function loadPlayersData() {
   }
 }
 
-function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg) {
-  const customData = customBlocksMined.map(block => ({
-    key: block,
-    value: playerData.blocksMined[block] || 0
-  }));
+function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg, customBlocksMined) {
+  const customData = customBlocksMined.map(block => playerData.blocksMined[block] || 0);
+
+  customBlocksMinedSvg.selectAll("*").remove();
+  createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData, BLOCK_COLORS);
+}
+
 
   customBlocksMinedSvg.selectAll("*").remove();
   createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData.map(d => d.value), BLOCK_COLORS);
@@ -178,7 +180,7 @@ function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg) {
 
 
 (async function main() {
-  const customBlocksMined = []; 
+  const customBlocksMined = [];
 
   try {
     const players = await loadPlayersData();
@@ -199,29 +201,28 @@ function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg) {
       updateGraph(player, players, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg });
     });
 
-
     // event listener to update the custom chart when the user adds a new block
     document.getElementById('custom-blocks-mined-form').addEventListener('submit', (event) => {
       event.preventDefault();
       const blockSelect = document.getElementById('block-select');
       const block = blockSelect.value;
-    
+
       if (block && !customBlocksMined.includes(block)) {
         customBlocksMined.push(block);
         const selectedPlayer = playerSelect.property('value');
         if (selectedPlayer) {
           const playerData = players.filter(d => d.player === selectedPlayer)[0];
-          updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg); // Pass the customBlocksMinedSvg here
+          updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg, customBlocksMined);
         }
       }
       blockSelect.value = '';
     });
-    
 
   } catch (error) {
     console.error("An error occurred:", error);
   }
 })();
+
 
 
 
