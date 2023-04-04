@@ -30,7 +30,7 @@ module.exports = async function (context, req) {
         } else {
             context.res = {
                 status: 400,
-                body: "Please provide a valid action and parameters.",
+                body:JSON.stringify({ message: "Please provide a valid action and parameters." }),
             };
         }
     } catch (error) {
