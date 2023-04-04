@@ -151,11 +151,9 @@ function updateGraph(player, data, { killsDeathsSvg, blocksMinedSvg, mobKillsSvg
 
   // Update blocks mined graph
   createBarGraph(blocksMinedSvg, CONTAINER_SIZE, Object.keys(playerData.blocksMined), Object.keys(playerData.blocksMined), Object.values(playerData.blocksMined), BLOCK_COLORS);
-
-
-
   // Update mob kills graph
-  createBarGraph(mobKillsSvg, CONTAINER_SIZE, Object.keys(playerData.mobKills), Object.values(playerData.mobKills));
+  createBarGraph(mobKillsSvg, CONTAINER_SIZE, Object.keys(playerData.mobKills), Object.keys(playerData.mobKills), Object.values(playerData.mobKills).map((value, index) => ({ key: Object.keys(playerData.mobKills)[index], value })));
+
 }
 
 async function loadPlayersData() {
