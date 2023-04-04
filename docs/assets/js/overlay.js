@@ -168,12 +168,6 @@ async function loadPlayersData() {
 
 function updateCustomBlocksMinedGraph(playerData, customBlocksMinedSvg, customBlocksMined) {
   const customData = customBlocksMined.map(block => playerData.blocksMined[block] || 0);
-
-  customBlocksMinedSvg.selectAll("*").remove();
-  createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData, BLOCK_COLORS);
-}
-
-
   customBlocksMinedSvg.selectAll("*").remove();
   createBarGraph(customBlocksMinedSvg, CONTAINER_SIZE, customBlocksMined, customBlocksMined, customData.map(d => d.value), BLOCK_COLORS);
 }
