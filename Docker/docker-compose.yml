@@ -28,7 +28,7 @@ services:
 
   overviewer:
     image: mide/minecraft-overviewer:latest
-    cpus: '0.80' # Limit the service to use a maximum of 80% of one CPU core
+    cpus: 0.80 # Limit the service to use a maximum of 80% of one CPU core
     depends_on:
       - mc
     environment:
