@@ -10,7 +10,9 @@ services:
       SERVER_NAME: "Our Minecraft Server"
       MOTD: "First Peaceful World"
       DIFFICULTY: "normal"
-      MEMORY: 3G
+      MEMORY: 5G
+      MAX_MEMORY: 6G
+      TYPE: PAPER
     volumes:
       - ./minecraft-data:/data
       - ./saves-to-import:/worlds:ro
@@ -28,13 +30,14 @@ services:
 
   overviewer:
     image: mide/minecraft-overviewer:latest
-    cpus: 0.80 # Limit the service to use a maximum of 80% of one CPU core
+    cpus: 2 # Limit the service to use a maximum of 80% of one CPU core
     depends_on:
       - mc
     environment:
       - CONFIG_PATH=/config/overviewer_config.py
       - CRON_SCHEDULE=0 */12 * * *
       - MINECRAFT_VERSION=latest
+      - processes=2
     volumes:
       - ./minecraft-data/world:/home/minecraft/server/world:ro
       - ./overviewer-data:/home/minecraft/render/:rw 

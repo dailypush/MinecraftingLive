@@ -8,6 +8,7 @@ sudo docker run hello-world
 
 echo "installing minecraft docker"
 sudo mkdir minecraft-docker
+sudo docker pull itzg/minecraft-server
 sudo docker pull mide/minecraft-overviewer:latest
 sudo docker pull
 cd mincraft-docker
