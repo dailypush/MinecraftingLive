@@ -5,6 +5,7 @@ services:
     image: itzg/minecraft-server
     ports:
       - 25565:25565
+      - 8100:8100
     environment:
       EULA: "TRUE"
       SERVER_NAME: "Our Minecraft Server"
@@ -23,34 +24,21 @@ services:
       - mc
     environment:
       BACKUP_INTERVAL: "2h"
+      PAUSE_IF_NO_PLAYERS: true
     volumes:
       - ./minecraft-data:/data:ro
       - ./mc-backups:/backups:rw
     network_mode: "service:mc"
 
-  overviewer:
-    image: mide/minecraft-overviewer:latest
-    cpus: 2 # Limit the service to use a maximum of 80% of one CPU core
-    depends_on:
-      - mc
-    environment:
-      - CONFIG_PATH=/config/overviewer_config.py
-      - CRON_SCHEDULE=0 */12 * * *
-      - MINECRAFT_VERSION=latest
-      - processes=2
-    volumes:
-      - ./minecraft-data/world:/home/minecraft/server/world:ro
-      - ./overviewer-data:/home/minecraft/render/:rw 
-      - ./data/overview/overviewer_config.py:/config/overviewer_config.py:ro
-    restart: on-failure:5
-
+  
   nginx:
     image: nginx:stable-alpine
+    depends_on:
+      - mc
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./overviewer-data:/usr/share/nginx/html:ro
       - ./data/nginx:/etc/nginx/conf.d
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
