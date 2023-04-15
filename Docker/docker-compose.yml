@@ -23,7 +23,6 @@ services:
     depends_on:
       - mc
     environment:
-      BACKUP_INTERVAL: "2h"
       PAUSE_IF_NO_PLAYERS: true
     volumes:
       - ./minecraft-data:/data:ro
