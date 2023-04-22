@@ -34,6 +34,7 @@ services:
     image: nginx:stable-alpine
     depends_on:
       - mc
+      - stats
     ports:
       - "80:80"
       - "443:443"
@@ -50,3 +51,28 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  stats:
+    build:
+      context: .
+      dockerfile: GoMinecraftStats.Dockerfile
+    ports:
+      - "8200:8200"
+    depends_on:
+      - redis
+    environment:
+      - POLLING_INTERVAL=5s
+      - STATS_SOURCE=json
+      - JSON_STATS_DIRECTORY=/json_stats
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+      - SERVER_PORT=8200
+    volumes:
+      - ./minecraft-data/world/stats:/json_stats:ro
+  redis:
+    image: "redis:6.2-alpine"
+    volumes:
+      - redis-data:/data
+volumes:
+  redis-data:

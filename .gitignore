@@ -3,3 +3,4 @@ mc-plugins/*
 schematics/*
 
 Docker/data/bluemaps/*
+Docker/data/certbot/*
