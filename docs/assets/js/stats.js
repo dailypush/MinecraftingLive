@@ -187,7 +187,7 @@ async function drawStackedBarChart(chartId, apiUrl) {
     .enter().append("rect")
     .attr("x", d => x(d.data.player))
     .attr("y", d => y(d[1]))
-    .attr("height", d => y(d[0]) - y(d[1]))
+    .attr("height", d => Math.max(0, y(d[0]) - y(d[1])))
     .attr("width", x.bandwidth());
 }
 
