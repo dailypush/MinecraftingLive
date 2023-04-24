@@ -1,101 +1,58 @@
-fetch("https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc")
-  .then(response => response.json())
-  .then(data => {
-    const chartData = data.map(item => ({
-      name: item.stat_type.split(":").pop().replace(/_/g, " "),
-      value: item.value
-    }));
 
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    const width = 500 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+const apiCache = new Map();
 
-    const svg = d3.select("#chart1")
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    const x = d3.scaleBand()
-      .range([0, width])
-      .padding(0.1);
-
-    const y = d3.scaleLinear()
-      .range([height, 0]);
-
-    x.domain(chartData.map(d => d.name));
-    y.domain([0, d3.max(chartData, d => d.value)]);
-
-    svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
-
-    svg.append("g")
-      .call(d3.axisLeft(y));
-
-    svg.selectAll(".bar")
-      .data(chartData)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", d => x(d.name))
-      .attr("width", x.bandwidth())
-      .attr("y", d => y(d.value))
-      .attr("height", d => height - y(d.value));
-  });
-  async function drawChart(chartId) {
-    const apiUrl = "https://stats.minecrafting.live/summarizedstats?statType=animals_bred";
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    const aggregatedStats = Object.entries(data.aggregatedStats);
-  
-    const margin = { top: 30, right: 30, bottom: 70, left: 50 };
-    const width = 500 - margin.left - margin.right;
-    const height = 300 - margin.top - margin.bottom;
-  
-    const x = d3.scaleBand()
-      .range([0, width])
-      .domain(aggregatedStats.map(d => d[0]))
-      .padding(0.2);
-  
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(aggregatedStats, d => d[1].animals_bred)])
-      .range([height, 0]);
-  
-    const svg = d3.select(`#${chartId}`)
-      .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-  
-    svg.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
-  
-    svg.append("g")
-      .call(d3.axisLeft(y));
-  
-    svg.selectAll("rect")
-      .data(aggregatedStats)
-      .enter()
-      .append("rect")
-        .attr("x", d => x(d[0]))
-        .attr("y", d => y(d[1].animals_bred))
-        .attr("width", x.bandwidth())
-        .attr("height", d => height - y(d[1].animals_bred))
-        .attr("fill", "#4e73df");
+async function fetchJsonCached(apiUrl) {
+  if (apiCache.has(apiUrl)) {
+    return apiCache.get(apiUrl);
   }
-  
+
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  apiCache.set(apiUrl, data);
+  return data;
+}
+
+async function getAggregatedStats(apiUrl, convertToMeters = false) {
+  const data = await fetchJsonCached(apiUrl);
+  let result = Object.entries(data.aggregatedStats);
+
+  if (convertToMeters) {
+    result = result.map(([name, value]) => [name, value / 100]);
+  }
+
+  return result;
+}
+
+async function getIndividualStats(apiUrl) {
+  const data = await fetchJsonCached(apiUrl);
+  const individualStats = data.individualStats;
+  const players = Object.keys(individualStats);
+  const processedData = players.map(player => {
+    const stats = individualStats[player];
+    return {
+      player,
+      walk_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0,
+      swim_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0,
+      fly_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0,
+    };
+  });
+  return processedData;
+}
+
+
+function createSvg(chartId, margin, width, height) {
+  return d3.select(`#${chartId}`)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+}
+
 
   async function drawHistogram(chartId, apiUrl) {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    const aggregatedStats = Object.entries(data.aggregatedStats).map(d => d[1].play_time);
+  const aggregatedStats = await getAggregatedStats(apiUrl);
+  const playTimes = aggregatedStats.map(d => d[1].play_time);
   
     const margin = { top: 30, right: 30, bottom: 70, left: 50 };
     const width = 500 - margin.left - margin.right;
@@ -142,59 +99,94 @@ fetch("https://stats.minecrafting.live/playerstats?category=minecraft:crafted&to
   }
   
 
+
+  async function drawHorizontalBarChart(chartId, apiUrl) {
+    const chartData = await getAggregatedStats(apiUrl, true);
   
-  //... (other chart functions)
+    const margin = { top: 30, right: 30, bottom: 70, left: 100 };
+    const width = 500 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
+  
+    const x = d3.scaleLinear()
+      .range([0, width])
+      .domain([0, d3.max(chartData, d => d[1])]);
+  
+    const y = d3.scaleBand()
+      .range([height, 0])
+      .domain(chartData.map(d => d[0]))
+      .padding(0.1);
+  
+    const svg = createSvg(chartId, margin, width, height);
+  
+    svg.append("g")
+      .call(d3.axisLeft(y));
+  
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
+  
+    svg.selectAll(".bar")
+      .data(chartData)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("y", d => y(d[0]))
+      .attr("height", y.bandwidth())
+      .attr("x", 0)
+      .attr("width", d => x(d[1]))
+      .attr("fill", "#4e73df");
+  }
+  
+  async function drawStackedBarChart(chartId, apiUrl) {
+    const chartData = await getIndividualStats(apiUrl);
+    const players = chartData.map(d => d.player);
+    const travelTypes = ['walk_one_cm', 'swim_one_cm', 'fly_one_cm'];
+  
+    const margin = { top: 30, right: 30, bottom: 70, left: 100 };
+    const width = 500 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
+  
+    const x = d3.scaleBand()
+      .domain(players)
+      .range([0, width])
+      .padding(0.1);
+  
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(chartData, d => d[1].walk_one_cm + d[1].swim_one_cm + d[1].fly_one_cm)]).nice()
+      .range([height, 0]);
+  
+    const color = d3.scaleOrdinal()
+      .domain(travelTypes)
+      .range(['#4e73df', '#1cc88a', '#36b9cc']);
+  
+    const svg = createSvg(chartId, margin, width, height);
+  
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
+  
+    svg.append("g")
+      .call(d3.axisLeft(y));
+  
+    const layer = svg.selectAll(".layer")
+      .data(d3.stack().keys(travelTypes)(chartData))
+      .enter().append("g")
+      .attr("class", "layer")
+      .attr("fill", d => color(d.key));
+  
+    layer.selectAll("rect")
+      .data(d => d)
+      .enter().append("rect")
+      .attr("x", d => x(d.data[0]))
+      .attr("y", d => y(d[1]))
+      .attr("height", d => y(d[0]) - y(d[1]))
+      .attr("width", x.bandwidth());
+  }
+  
 
-  async function drawLineChart(chartId, apiUrl) {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    const chartData = Object.entries(data.aggregatedStats).map(([name, stats]) => ({
-      name,
-      value: stats.one_cm / 100
-    }));
-
-  const margin = { top: 30, right: 30, bottom: 70, left: 50 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
-
-  const x = d3.scalePoint()
-    .range([0, width])
-    .domain(chartData.map(d => d.name))
-    .padding(0.5);
-
-  const y = d3.scaleLinear()
-    .range([height, 0])
-    .domain([0, d3.max(chartData, d => d.value)]);
-
-  const line = d3.line()
-    .x(d => x(d.name))
-    .y(d => y(d.value));
-
-  const svg = d3.select(`#${chartId}`)
-    .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-  svg.append("g")
-    .attr("transform", `translate(0,${height})`)
-    .call(d3.axisBottom(x))
-    .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)")
-      .style("text-anchor", "end");
-
-  svg.append("g")
-    .call(d3.axisLeft(y));
-
-  svg.append("path")
-    .datum(chartData)
-    .attr("fill", "none")
-    .attr("stroke", "#4e73df")
-    .attr("stroke-width", 2)
-    .attr("d", line);
-}
-
-drawLineChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm");
+// Call the functions for the specific charts
+drawChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
+drawChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
 drawHistogram("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time");
-drawChart("chart2"); // Call the function for the specific chart
+drawHorizontalBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm");
+
