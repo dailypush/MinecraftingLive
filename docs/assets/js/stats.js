@@ -41,8 +41,9 @@ async function drawBarChart(chartId, apiUrl) {
   const chartData = await getAggregatedStats(apiUrl);
 
   const margin = { top: 30, right: 30, bottom: 70, left: 100 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
+  const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
+  const height = parseInt(d3.select(`#${chartId}`).style("height")) - margin.top - margin.bottom;
+  
 
   const x = d3.scaleLinear()
     .range([0, width])
@@ -89,8 +90,8 @@ async function drawPieChart(chartId, apiUrl, valueTransformFn) {
   const chartData = await getAggregatedStats(apiUrl, valueTransformFn);
 
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
+  const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
+  const height = parseInt(d3.select(`#${chartId}`).style("height")) - margin.top - margin.bottom;
   const radius = Math.min(width, height) / 2;
 
   const svg = createSvg(chartId, margin, width, height);
@@ -136,8 +137,9 @@ async function drawStackedBarChart(chartId, apiUrl) {
   });
 
   const margin = { top: 30, right: 30, bottom: 70, left: 100 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
+  const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
+  const height = parseInt(d3.select(`#${chartId}`).style("height")) - margin.top - margin.bottom;
+  
 
 
   const x = d3.scaleBand()
