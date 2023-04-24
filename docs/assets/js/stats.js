@@ -12,16 +12,13 @@ async function fetchJsonCached(apiUrl) {
   return data;
 }
 
-async function getAggregatedStats(apiUrl, convertToMeters = false) {
+async function getAggregatedStats(apiUrl, valueTransformFn = v => v) {
   const data = await fetchJsonCached(apiUrl);
-  let result = Object.entries(data.aggregatedStats);
-
-  if (convertToMeters) {
-    result = result.map(([name, value]) => [name, value / 100]);
-  }
-
-  return result;
+  return Object.entries(data.aggregatedStats).map(([player, stats]) => {
+    return { player, value: valueTransformFn(stats) };
+  });
 }
+
 
 async function getIndividualStats(apiUrl) {
   const data = await fetchJsonCached(apiUrl);
@@ -49,59 +46,46 @@ function createSvg(chartId, margin, width, height) {
     .attr("transform", `translate(${margin.left},${margin.top})`);
 }
 
+async function drawPieChart(chartId, apiUrl, valueTransformFn) {
+  const chartData = await getAggregatedStats(apiUrl, valueTransformFn);
 
-  async function drawHistogram(chartId, apiUrl) {
-  const aggregatedStats = await getAggregatedStats(apiUrl);
-  const playTimes = aggregatedStats.map(d => d[1].play_time);
-  
-    const margin = { top: 30, right: 30, bottom: 70, left: 50 };
-    const width = 500 - margin.left - margin.right;
-    const height = 300 - margin.top - margin.bottom;
-  
-    const x = d3.scaleLinear()
-      .domain([0, d3.max(aggregatedStats)])
-      .range([0, width]);
-  
-    const histogram = d3.histogram()
-      .value(d => d)
-      .domain(x.domain())
-      .thresholds(x.ticks(30));
-  
-    const bins = histogram(aggregatedStats);
-  
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(bins, d => d.length)])
-      .range([height, 0]);
-  
-    const svg = d3.select(`#${chartId}`)
-      .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-  
-    svg.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x));
-  
-    svg.append("g")
-      .call(d3.axisLeft(y));
-  
-    svg.selectAll("rect")
-      .data(bins)
-      .enter()
-      .append("rect")
-        .attr("x", d => x(d.x0))
-        .attr("y", d => y(d.length))
-        .attr("width", d => x(d.x1) - x(d.x0) - 1)
-        .attr("height", d => height - y(d.length))
-        .attr("fill", "#4e73df");
-  }
-  
+  const margin = { top: 30, right: 30, bottom: 30, left: 30 };
+  const width = 500 - margin.left - margin.right;
+  const height = 300 - margin.top - margin.bottom;
+  const radius = Math.min(width, height) / 2;
+
+  const svg = createSvg(chartId, margin, width, height);
+
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  const pie = d3.pie()
+    .sort(null)
+    .value(d => d.value);
+
+  const arc = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius);
+
+  const g = svg.selectAll(".arc")
+    .data(pie(chartData))
+    .enter().append("g")
+    .attr("class", "arc");
+
+  g.append("path")
+    .attr("d", arc)
+    .style("fill", d => color(d.data.player));
+
+  g.append("text")
+    .attr("transform", d => `translate(${arc.centroid(d)})`)
+    .attr("dy", ".35em")
+    .text(d => d.data.player)
+    .style("font-size", "10px")
+    .style("text-anchor", "middle");
+}
 
 
-  async function drawHorizontalBarChart(chartId, apiUrl) {
-    const chartData = await getAggregatedStats(apiUrl, true);
+async function drawStackedBarChart(chartId, apiUrl, valueTransformFn) {
+  const chartData = await getAggregatedStats(apiUrl, valueTransformFn);
   
     const margin = { top: 30, right: 30, bottom: 70, left: 100 };
     const width = 500 - margin.left - margin.right;
@@ -187,6 +171,7 @@ function createSvg(chartId, margin, width, height) {
 // Call the functions for the specific charts
 drawChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
 drawChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
-drawHistogram("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time");
-drawHorizontalBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm");
+drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
+drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statTypes=walk_one_cm,swim_one_cm,fly_one_cm", stats => stats.one_cm / 100); // Convert centimeters to meters
+
 
