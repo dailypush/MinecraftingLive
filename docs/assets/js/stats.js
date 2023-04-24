@@ -91,7 +91,7 @@ fetch("https://stats.minecrafting.live/playerstats?category=minecraft:crafted&to
         .attr("fill", "#4e73df");
   }
   
-  drawChart("chart2"); // Call the function for the specific chart
+
   async function drawHistogram(chartId, apiUrl) {
     const response = await fetch(apiUrl);
     const data = await response.json();
@@ -141,5 +141,60 @@ fetch("https://stats.minecrafting.live/playerstats?category=minecraft:crafted&to
         .attr("fill", "#4e73df");
   }
   
-  drawHistogram("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time");
+
   
+  //... (other chart functions)
+
+  async function drawLineChart(chartId, apiUrl) {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const chartData = Object.entries(data.aggregatedStats).map(([name, stats]) => ({
+      name,
+      value: stats.one_cm / 100
+    }));
+
+  const margin = { top: 30, right: 30, bottom: 70, left: 50 };
+  const width = 500 - margin.left - margin.right;
+  const height = 300 - margin.top - margin.bottom;
+
+  const x = d3.scalePoint()
+    .range([0, width])
+    .domain(chartData.map(d => d.name))
+    .padding(0.5);
+
+  const y = d3.scaleLinear()
+    .range([height, 0])
+    .domain([0, d3.max(chartData, d => d.value)]);
+
+  const line = d3.line()
+    .x(d => x(d.name))
+    .y(d => y(d.value));
+
+  const svg = d3.select(`#${chartId}`)
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+      .attr("transform", "translate(-10,0)rotate(-45)")
+      .style("text-anchor", "end");
+
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  svg.append("path")
+    .datum(chartData)
+    .attr("fill", "none")
+    .attr("stroke", "#4e73df")
+    .attr("stroke-width", 2)
+    .attr("d", line);
+}
+
+drawLineChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm");
+drawHistogram("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time");
+drawChart("chart2"); // Call the function for the specific chart
