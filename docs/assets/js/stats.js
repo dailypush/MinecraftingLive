@@ -92,4 +92,54 @@ fetch("https://stats.minecrafting.live/playerstats?category=minecraft:crafted&to
   }
   
   drawChart("chart2"); // Call the function for the specific chart
+  async function drawHistogram(chartId, apiUrl) {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const aggregatedStats = Object.entries(data.aggregatedStats).map(d => d[1].play_time);
+  
+    const margin = { top: 30, right: 30, bottom: 70, left: 50 };
+    const width = 500 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
+  
+    const x = d3.scaleLinear()
+      .domain([0, d3.max(aggregatedStats)])
+      .range([0, width]);
+  
+    const histogram = d3.histogram()
+      .value(d => d)
+      .domain(x.domain())
+      .thresholds(x.ticks(30));
+  
+    const bins = histogram(aggregatedStats);
+  
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(bins, d => d.length)])
+      .range([height, 0]);
+  
+    const svg = d3.select(`#${chartId}`)
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
+  
+    svg.append("g")
+      .call(d3.axisLeft(y));
+  
+    svg.selectAll("rect")
+      .data(bins)
+      .enter()
+      .append("rect")
+        .attr("x", d => x(d.x0))
+        .attr("y", d => y(d.length))
+        .attr("width", d => x(d.x1) - x(d.x0) - 1)
+        .attr("height", d => height - y(d.length))
+        .attr("fill", "#4e73df");
+  }
+  
+  drawHistogram("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time");
   
