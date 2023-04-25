@@ -191,8 +191,21 @@ async function drawStackedBarChart(chartId, apiUrl) {
     .attr("width", x.bandwidth());
 }
 
-// Call the functions for the specific charts
-//drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
-drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
-drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
-drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
+
+const debouncedDrawAllCharts = debounce(() => {
+  // Remove the old SVGs before redrawing
+  d3.selectAll("svg").remove();
+  drawAllCharts();
+}, 250); // The debounce delay in milliseconds, adjust as needed
+
+window.addEventListener("resize", debouncedDrawAllCharts);
+drawAllCharts();
+
+function drawAllCharts() {
+  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
+  drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
+  drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
+  drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
+}
+
+drawAllCharts();
