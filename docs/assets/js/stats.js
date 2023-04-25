@@ -192,7 +192,7 @@ async function drawStackedBarChart(chartId, apiUrl) {
 }
 
 // Call the functions for the specific charts
-drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
+//drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
 drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
 drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
 drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
