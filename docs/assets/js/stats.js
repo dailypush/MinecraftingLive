@@ -20,6 +20,18 @@ async function fetchJsonCached(apiUrl) {
   }
 }
 
+async function getChartDataForChart1(apiUrl) {
+  const data = await fetchJsonCached(apiUrl);
+  if (!data) {
+    console.error("Error: data not found");
+    return [];
+  }
+
+  return data.map(item => {
+    return { player: item.player, value: item.value };
+  });
+}
+
 
 async function getAggregatedStats(apiUrl, valueTransformFn = v => v) {
   const data = await fetchJsonCached(apiUrl);
@@ -49,8 +61,8 @@ async function getIndividualStats(apiUrl) {
 }
 
 
-async function drawBarChart(chartId, apiUrl, valueExtractor = d => d.value) {
-  const chartData = await getAggregatedStats(apiUrl);
+async function drawBarChart(chartId, apiUrl, dataFetcher = getAggregatedStats) {
+  const chartData = await dataFetcher(apiUrl);
 
   const margin = { top: 30, right: 30, bottom: 70, left: 100 };
   // const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
@@ -238,7 +250,7 @@ window.addEventListener("resize", debouncedDrawAllCharts);
 drawAllCharts();
 
 function drawAllCharts() {
-  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc", d => d.statValue);
+  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc", getChartDataForChart1);
   drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
   drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
   drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
