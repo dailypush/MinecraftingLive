@@ -49,7 +49,7 @@ async function getIndividualStats(apiUrl) {
 }
 
 
-async function drawBarChart(chartId, apiUrl) {
+async function drawBarChart(chartId, apiUrl, valueExtractor = d => d.value) {
   const chartData = await getAggregatedStats(apiUrl);
 
   const margin = { top: 30, right: 30, bottom: 70, left: 100 };
@@ -76,7 +76,7 @@ async function drawBarChart(chartId, apiUrl) {
     .attr("transform", `translate(0,${height})`)
     .call(d3.axisBottom(x));
 
-  svg.selectAll(".bar")
+    svg.selectAll(".bar")
     .data(chartData)
     .enter()
     .append("rect")
@@ -84,10 +84,9 @@ async function drawBarChart(chartId, apiUrl) {
     .attr("y", d => y(d.player))
     .attr("height", y.bandwidth())
     .attr("x", 0)
-    .attr("width", d => x(d.value))
+    .attr("width", d => x(valueExtractor(d)))
     .attr("fill", "#4e73df");
 }
-
 
 
 function createSvg(chartId, margin, width, height) {
@@ -118,7 +117,6 @@ async function drawPieChart(chartId, apiUrl, valueTransformFn) {
 
   const svg = createPieSvg(chartId, margin, width, height);
 
-
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
   const pie = d3.pie()
@@ -128,6 +126,11 @@ async function drawPieChart(chartId, apiUrl, valueTransformFn) {
   const arc = d3.arc()
     .innerRadius(0)
     .outerRadius(radius);
+
+  // Create a labelArc with a larger radius than the arc
+  const labelArc = d3.arc()
+    .innerRadius(radius + 10)
+    .outerRadius(radius + 10);
 
   const g = svg.selectAll(".arc")
     .data(pie(chartData))
@@ -139,7 +142,7 @@ async function drawPieChart(chartId, apiUrl, valueTransformFn) {
     .style("fill", d => color(d.data.player));
 
   g.append("text")
-    .attr("transform", d => `translate(${arc.centroid(d)})`)
+    .attr("transform", d => `translate(${labelArc.centroid(d)})`) // Use the labelArc to position the labels
     .attr("dy", ".35em")
     .text(d => d.data.player)
     .style("font-size", "10px")
@@ -205,10 +208,10 @@ async function drawStackedBarChart(chartId, apiUrl) {
 }
 
 
-  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
-  drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
-  drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
-  drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
+// drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc", 'statValue');
+//   drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
+//   drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
+//   drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
 
 function debounce(func, wait, immediate) {
   let timeout;
@@ -235,7 +238,7 @@ window.addEventListener("resize", debouncedDrawAllCharts);
 drawAllCharts();
 
 function drawAllCharts() {
-  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc");
+  drawBarChart("chart1", "https://stats.minecrafting.live/playerstats?category=minecraft:crafted&top=10&sort=desc", d => d.statValue);
   drawBarChart("chart2", "https://stats.minecrafting.live/summarizedstats?statType=animals_bred");
   drawPieChart("chart3", "https://stats.minecrafting.live/summarizedstats?statType=play_time", stats => stats.play_time / 3600); // Convert seconds to hours
   drawStackedBarChart("chart4", "https://stats.minecrafting.live/summarizedstats?statType=one_cm"); // Convert centimeters to meters
