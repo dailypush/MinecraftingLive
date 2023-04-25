@@ -80,6 +80,47 @@ async function drawBarChart(chartId, apiUrl) {
     });
   }
   
+  async function drawSummedCategoriesBarChart(chartId, apiUrl) {
+    const data = await fetchData(apiUrl);
+    const categories = {};
+
+    for (const player in data) {
+        for (const category in data[player]) {
+            const value = data[player][category];
+            if (categories[category]) {
+                categories[category] += value;
+            } else {
+                categories[category] = value;
+            }
+        }
+    }
+
+    const labels = Object.keys(categories);
+    const values = Object.values(categories);
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Value',
+                data: values,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
   async function drawPieChart(chartId, apiUrl) {
     const data = await fetchData(apiUrl);
     const isArray = Array.isArray(data);
@@ -188,7 +229,8 @@ async function drawAllCharts() {
     const chart3ApiUrl = 'https://stats.minecrafting.live/summarizedstats?statType=play_time';
     const chart4ApiUrl = 'https://stats.minecrafting.live/summarizedstats?statType=one_cm';
 
-    await drawBarChart('chart1', chart1ApiUrl);
+    await drawSummedCategoriesBarChart('chart1', chart1ApiUrl);
+
 
     const chart2Data = await fetchChartData(chart2ApiUrl);
     const { labels, data } = prepareChartData2(chart2Data);
