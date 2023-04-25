@@ -99,8 +99,18 @@ async function drawSummedCategoriesBarChart(chartId, apiUrl) {
     let labels, values;
 
     if (isArray) {
-        labels = data.map(item => item.stat_type.split(':').pop());
-        values = data.map(item => item.value);
+        const groupedData = data.reduce((acc, item) => {
+            const itemLabel = item.stat_type.split(':').pop();
+            if (acc[itemLabel]) {
+                acc[itemLabel] += item.value;
+            } else {
+                acc[itemLabel] = item.value;
+            }
+            return acc;
+        }, {});
+
+        labels = Object.keys(groupedData);
+        values = Object.values(groupedData);
     } else {
         labels = Object.keys(data);
         values = Object.values(data);
@@ -128,6 +138,7 @@ async function drawSummedCategoriesBarChart(chartId, apiUrl) {
         }
     });
 }
+
 
 
 async function getIndividualStats(apiUrl) {
