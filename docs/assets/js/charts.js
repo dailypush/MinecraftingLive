@@ -54,32 +54,32 @@ async function fetchData(apiUrl) {
 async function drawBarChart(chartId, apiUrl) {
     const data = await fetchData(apiUrl);
     const isArray = Array.isArray(data);
-    const labels = isArray ? data.map(item => item.player) : Object.keys(data);
+    const labels = isArray ? data.map(item => item.stat_type.split(':').pop()) : Object.keys(data);
     const values = isArray ? data.map(item => item.value) : Object.values(data);
-  
+
     const ctx = document.getElementById(chartId).getContext('2d');
     new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Value',
-          data: values,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Value',
+                data: values,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
-      }
     });
-  }
-  
+}
+
   async function drawSummedCategoriesBarChart(chartId, apiUrl) {
     const data = await fetchData(apiUrl);
     const categories = {};
@@ -161,16 +161,17 @@ async function getIndividualStats(apiUrl) {
     const individualStats = data.individualStats;
     const players = Object.keys(individualStats);
     const processedData = players.map(player => {
-      const stats = individualStats[player];
-      return {
-        player,
-        walk_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0,
-        swim_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0,
-        fly_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0,
-      };
+        const stats = individualStats[player];
+        return {
+            player,
+            walk_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0) / 100,
+            swim_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0) / 100,
+            fly_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0) / 100,
+        };
     });
     return processedData;
-  }
+}
+
   
 async function drawStackedBarChart(chartId, apiUrl) {
     const data = await getIndividualStats(apiUrl);
