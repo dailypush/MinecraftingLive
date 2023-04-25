@@ -115,6 +115,22 @@ async function drawPieChart(chartId, apiUrl) {
     });
 }
 
+async function getIndividualStats(apiUrl) {
+    const data = await fetchData(apiUrl);
+    const individualStats = data.individualStats;
+    const players = Object.keys(individualStats);
+    const processedData = players.map(player => {
+      const stats = individualStats[player];
+      return {
+        player,
+        walk_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0,
+        swim_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0,
+        fly_one_cm: stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0,
+      };
+    });
+    return processedData;
+  }
+  
 async function drawStackedBarChart(chartId, apiUrl) {
     const data = await getIndividualStats(apiUrl);
     const labels = data.map(item => item.player);
