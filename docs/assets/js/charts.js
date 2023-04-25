@@ -92,23 +92,19 @@ async function drawPieChart(chartId, apiUrl) {
     });
 }
 
-  async function drawSummedCategoriesBarChart(chartId, apiUrl) {
-    const data = await fetchData(apiUrl);
-    const categories = {};
+async function drawSummedCategoriesBarChart(chartId, apiUrl) {
+    const rawData = await fetchData(apiUrl);
+    const data = rawData.aggregatedStats || rawData;
+    const isArray = Array.isArray(data);
+    let labels, values;
 
-    for (const player in data) {
-        for (const category in data[player]) {
-            const value = data[player][category];
-            if (categories[category]) {
-                categories[category] += value;
-            } else {
-                categories[category] = value;
-            }
-        }
+    if (isArray) {
+        labels = data.map(item => item.stat_type.split(':').pop());
+        values = data.map(item => item.value);
+    } else {
+        labels = Object.keys(data);
+        values = Object.values(data);
     }
-
-    const labels = Object.keys(categories);
-    const values = Object.values(categories);
 
     const ctx = document.getElementById(chartId).getContext('2d');
     new Chart(ctx, {
@@ -142,9 +138,9 @@ async function getIndividualStats(apiUrl) {
         const stats = individualStats[player];
         return {
             player,
-            walk_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0) / 100,
-            swim_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0) / 100,
-            fly_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0) / 100,
+            walk_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:walk_one_cm'] || 0) / 1000,
+            swim_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:swim_one_cm'] || 0) / 1000,
+            fly_one_cm: (stats['player_stats:' + player + ':minecraft:custom:minecraft:fly_one_cm'] || 0) / 1000,
         };
     });
     return processedData;
