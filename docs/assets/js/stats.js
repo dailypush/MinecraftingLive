@@ -96,7 +96,15 @@ function createSvg(chartId, margin, width, height) {
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", `translate(${(width + margin.left + margin.right) / 2},${(height + margin.top + margin.bottom) / 2})`);
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+}
+function createPieSvg(chartId, margin, width, height) {
+  return d3.select(`#${chartId}`)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${width / 2 + margin.left},${height / 2 + margin.top})`);
 }
 
 
@@ -104,13 +112,12 @@ async function drawPieChart(chartId, apiUrl, valueTransformFn) {
   const chartData = await getAggregatedStats(apiUrl, valueTransformFn);
 
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  const width = 500 - margin.left - margin.right;
-  const height = 300 - margin.top - margin.bottom;
-  // const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
-  // const height = parseInt(d3.select(`#${chartId}`).style("height")) - margin.top - margin.bottom;
+  const width = parseInt(d3.select(`#${chartId}`).style("width")) - margin.left - margin.right;
+  const height = parseInt(d3.select(`#${chartId}`).style("height")) - margin.top - margin.bottom;
   const radius = Math.min(width, height) / 2;
 
-  const svg = createSvg(chartId, margin, width, height);
+  const svg = createPieSvg(chartId, margin, width, height);
+
 
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
