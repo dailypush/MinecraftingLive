@@ -51,31 +51,43 @@ async function fetchData(apiUrl) {
     }
 }
 
-async function drawBarChart(chartId, apiUrl) {
-    const data = await fetchData(apiUrl);
+async function drawPieChart(chartId, apiUrl) {
+    const rawData = await fetchData(apiUrl);
+    const data = rawData.aggregatedStats || rawData;
     const isArray = Array.isArray(data);
-    const labels = isArray ? data.map(item => item.stat_type.split(':').pop()) : Object.keys(data);
-    const values = isArray ? data.map(item => item.value) : Object.values(data);
+    const labels = isArray ? data.map(item => item.player) : Object.keys(data);
+    const values = isArray ? data.map(item => item.value) : Object.values(data).map(player => player.play_time);
+
+    // If data is an array of objects with player, stat_type, and value fields
+    if (isArray && data[0].hasOwnProperty('stat_type')) {
+        labels = data.map(item => item.stat_type.split(':').pop());
+    }
 
     const ctx = document.getElementById(chartId).getContext('2d');
     new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Value',
                 data: values,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
                 borderWidth: 1
             }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
         }
     });
 }
