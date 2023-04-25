@@ -80,11 +80,11 @@ async function drawBarChart(chartId, apiUrl) {
     });
   }
   
-
-async function drawPieChart(chartId, apiUrl) {
+  async function drawPieChart(chartId, apiUrl) {
     const data = await fetchData(apiUrl);
-    const labels = data.map(item => item.player);
-    const values = data.map(item => item.value);
+    const isArray = Array.isArray(data);
+    const labels = isArray ? data.map(item => item.player) : Object.keys(data);
+    const values = isArray ? data.map(item => item.value) : Object.values(data);
 
     const ctx = document.getElementById(chartId).getContext('2d');
     new Chart(ctx, {
