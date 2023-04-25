@@ -96,8 +96,9 @@ function createSvg(chartId, margin, width, height) {
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .attr("transform", `translate(${(width + margin.left + margin.right) / 2},${(height + margin.top + margin.bottom) / 2})`);
 }
+
 
 async function drawPieChart(chartId, apiUrl, valueTransformFn) {
   const chartData = await getAggregatedStats(apiUrl, valueTransformFn);
