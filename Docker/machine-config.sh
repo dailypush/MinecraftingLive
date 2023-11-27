@@ -37,6 +37,10 @@ sudo firewall-cmd --permanent --zone=public --add-port=25565/tcp
 sudo firewall-cmd --permanent --zone=public --add-port=25565/udp
 sudo firewall-cmd --reload
 
+#bedrock
+sudo firewall-cmd --permanent --zone=public --add-port=19132/udp
+sudo firewall-cmd --reload
+
 sudo touch /var/log/minecraft-cron.log
 sudo chown opc:opc /var/log/minecraft-cron.log
 sudo chmod 640  /var/log/minecraft-cron.log

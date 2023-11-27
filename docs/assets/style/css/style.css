@@ -1,6 +1,4 @@
-<?php header("Content-type: text/css");
-
-?>* {
+* {
     font-family: 'Times New Roman';
     margin: 0;
     padding: 0;
@@ -253,7 +251,8 @@ footer {
 .btn-warning:hover,
 .btn-warning:focus {
     color: #fff;
-    background: #f9a825 filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 1));
+    background: none;
+    filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 1));
 }
 
 .btn-dark {

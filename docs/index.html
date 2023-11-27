@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" oncontextmenu="return false">
+<html lang="en">
 
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="author" content="Dailypush">
 	<meta property="og:title" content="Minecrafting Live | Official">
-	<meta property="og:description" content="Join Minecrafting.live, the ultimate destination for Minecraft fans and Twitch viewers! Watch top Twitch streamers build and explore the latest Minecraft maps.">
-	<meta property="og:image" content="https://i.ibb.co/SnqFXZK/logo.png">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta property="og:description"
+		content="Join Minecrafting.live, the ultimate destination for Minecraft fans and Twitch viewers! Watch top Twitch streamers build and explore the latest Minecraft maps.">
+	<meta property="og:image" content="./assets/image/logo.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Minecrafting Live | Home</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png">
+<link rel="manifest" href="./assets/favicon/site.webmanifest">
 	<link rel="shortcut icon" type="image/png" href="assets/image/logo.png" />
 	<link rel="stylesheet" href="assets/style/css/bootstrap.min.css" type="text/css">
 	<link rel="stylesheet" href="assets/style/css/style.css" type="text/css">
@@ -18,14 +23,13 @@
 </head>
 
 <body>
-
 	<header>
 		<div class="jumbotron jumbotron-fluid">
 			<div class="container text-center text-white new-text">
-				<img id="logo" src="assets/image/logo.png" class="img-fluid" alt="">
+				<img id="logo" src="assets/image/logo.png" class="img-fluid" alt="Minecrafting Live Logo">
 			</div>
 		</div>
-		<nav class="navbar navbar-expand-lg navbar-dark">
+		<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
 				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -43,7 +47,8 @@
 						<a class="nav-link" href="streamer.html"><i class="fa fa-fw fa-align-justify"></i> Streamers</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="overlay.html"><i class="fa fa-fw fa-align-justify"></i> Streamer Overlay</a>
+						<a class="nav-link" href="overlay.html"><i class="fa fa-fw fa-align-justify"></i> Streamer
+							Overlay</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="stats.html"><i class="fa fa-fw fa-align-justify"></i> Game Stats</a>
@@ -55,7 +60,7 @@
 			</div>
 		</nav>
 	</header>
-	<midle>
+	<main>
 		<div class="container">
 			<div class="row">
 				<div class="col-md-8">
@@ -154,7 +159,7 @@
 				</div>
 			</div>
 		</div>
-	</midle>
+	</main>
 	<footer>
 		<div class="container">
 			<div class="text">
@@ -176,34 +181,33 @@
 	<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.13/clipboard.min.js"></script>
 
 	<script type="text/javascript">
+		// Improved Clipboard Functionality
 		var clipboard = new Clipboard('.copyIp');
-		var clipboardaction = false;
 		clipboard.on('success', function (e) {
-			if (!clipboardaction) {
-				clipboardaction = true;
-				setTimeout(function () {
-					setTimeout(function () {
-						clipboardaction = false;
-					}, 1000);
-				}, 1000);
-			}
+			console.log('IP Copied: ' + e.text);
+		});
+		clipboard.on('error', function (e) {
+			console.log('Error copying IP');
 		});
 
-	</script>
-
-	<script>
+		// Improved Server Status Script
 		MinecraftAPI.getServerStatus('mc.minecrafting.live', {
 			port: 25565
 		}, function (err, status) {
-			if (err) {
-				document.getElementById("status").className = 'pull-right badge badge-danger text-uppercase';
-				document.querySelector('#status').innerHTML = 'Offline';
-				document.querySelector('#players').innerHTML = "0";
+			var statusElement = document.getElementById("status");
+			var playersElement = document.getElementById("players");
+			var versionElement = document.getElementById("version");
+
+			if (err || !status.online) {
+				statusElement.className = 'pull-right badge badge-danger text-uppercase';
+				statusElement.innerHTML = 'Offline';
+				playersElement.innerHTML = "0";
+				return;
 			}
 
-			document.querySelector('#status').innerHTML = status.online ? 'Online' : 'Offline';
-			document.querySelector('#version').innerHTML = status.server.name;
-			document.querySelector('#players').innerHTML = status.players.now;
+			statusElement.innerHTML = 'Online';
+			playersElement.innerHTML = status.players.now;
+			versionElement.innerHTML = status.server.name;
 		});
 	</script>
 </body>

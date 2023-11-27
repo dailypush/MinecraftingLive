@@ -5,15 +5,17 @@ services:
     image: itzg/minecraft-server
     ports:
       - 25565:25565
+      - 19132:19132/udp
       - 8100:8100
     environment:
       EULA: "TRUE"
-      SERVER_NAME: "Our Minecraft Server"
+      SERVER_NAME: "FamilyMinecraft"
       MOTD: "First Peaceful World"
       DIFFICULTY: "normal"
       MEMORY: 5G
       MAX_MEMORY: 6G
       TYPE: PAPER
+    restart: unless-stopped
     volumes:
       - ./minecraft-data:/data
       - ./saves-to-import:/worlds:ro
@@ -24,6 +26,7 @@ services:
       - mc
     environment:
       PAUSE_IF_NO_PLAYERS: true
+    restart: unless-stopped
     volumes:
       - ./minecraft-data:/data:ro
       - ./mc-backups:/backups:rw

@@ -1,6 +1,8 @@
 .secrets
 mc-plugins/*
 schematics/*
-
+backups/*
 Docker/data/bluemaps/*
 Docker/data/certbot/*
+logs/*
+
